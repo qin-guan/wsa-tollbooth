@@ -3,6 +3,7 @@ import { publicProcedure, router } from '../trpc'
 import { authRouter } from './auth'
 import { meRouter } from './me'
 import { surveyRouter } from './survey'
+import { analyticsRouter } from './analytics'
 
 export const appRouter = router({
   hello: publicProcedure
@@ -19,6 +20,7 @@ export const appRouter = router({
     }),
   auth: authRouter,
   survey: surveyRouter,
+  analytics: analyticsRouter,
   me: meRouter,
 })
 

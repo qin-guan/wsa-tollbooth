@@ -38,8 +38,9 @@ model Survey {
 }
 
 model Response {
-  id   String @id @default(cuid())
-  data Json
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+  data      Json
 
   survey       Survey @relation(fields: [surveyId], references: [id])
   surveyId     String

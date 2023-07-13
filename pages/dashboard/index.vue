@@ -95,6 +95,10 @@ async function create() {
         </template>
       </Column>
     </DataTable>
+
+    <br>
+
+    <Button size="small" label="Create new" @click="visible = true" />
   </main>
 </template>
 

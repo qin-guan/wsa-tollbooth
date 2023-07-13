@@ -10,6 +10,7 @@ const route = useRoute()
 
 const { data } = await $client.survey.get.useQuery({ id: route.params.id as string })
 
+const pending = ref(false)
 const formData = reactive(data.value)
 
 const options = [
@@ -18,6 +19,17 @@ const options = [
 ]
 
 async function update() {
+  pending.value = true
+
+  try {
+    await $client.survey.update.mutate(formData)
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    pending.value = false
+  }
 }
 
 function addQuestion() {
@@ -40,6 +52,15 @@ function deleteOption(questionIdx: number, optionIdx: number) {
 
 <template>
   <main mx-auto p-6 container>
+    <div my-6 border-red-600 rounded-md bg-red-500 bg-opacity-50 p-5>
+      <span font-semibold>
+        Warning!
+      </span>
+      <br>
+      Please take caution when editing a form after it has received responses. As much as possible, it should be avoided.
+      <br>
+      The type of a question should never be changed.
+    </div>
     <form flex flex-col gap5 @submit.prevent="update">
       <div class="flex flex-col gap-2">
         <label for="title">Form title</label>
@@ -60,7 +81,7 @@ function deleteOption(questionIdx: number, optionIdx: number) {
 
       <hr>
 
-      <Card v-for="(question, idx) in formData.schema" :key="idx">
+      <Card v-for="(_, idx) in formData.schema" :key="idx">
         <template #content>
           <div flex gap3>
             <div class="flex flex-1 flex-col gap-2">
@@ -88,7 +109,7 @@ function deleteOption(questionIdx: number, optionIdx: number) {
                 <span mb2 font-semibold>Options</span>
                 <Button label="Add" size="small" @click="addOption(idx)" />
               </div>
-              <div v-for="(option, optionIdx) in formData.schema[idx].options" :key="optionIdx" flex items-center>
+              <div v-for="(_, optionIdx) in formData.schema[idx].options" :key="optionIdx" flex items-center>
                 <span mr4>
                   {{ optionIdx + 1 }}.
                 </span>
@@ -103,7 +124,7 @@ function deleteOption(questionIdx: number, optionIdx: number) {
       </Card>
 
       <div>
-        <Button type="submit" label="Save" />
+        <Button type="submit" label="Save" :loading="pending" />
       </div>
     </form>
   </main>

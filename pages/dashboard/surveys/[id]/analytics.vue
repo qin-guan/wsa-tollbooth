@@ -32,7 +32,7 @@ const { data } = await $client.analytics.listResponses.useQuery({ id: route.para
           <Column field="timestamp" header="Timestamp" />
           <Column field="respondentId" header="Respondent" />
           <Column header="Expand">
-            <template #body="slotProps">
+            <template #body>
               <Button icon="" link>
                 <div i-tabler-arrow-up-right text-xl />
               </Button>

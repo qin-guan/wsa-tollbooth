@@ -19,6 +19,23 @@ const options = [
 
 async function update() {
 }
+
+function addQuestion() {
+  formData.schema.push({
+    title: '',
+    description: '',
+    type: 'text',
+    options: [],
+  })
+}
+
+function addOption(questionIdx: number) {
+  formData.schema[questionIdx].options.push('')
+}
+
+function deleteOption(questionIdx: number, optionIdx: number) {
+  formData.schema[questionIdx].options.splice(optionIdx, 1)
+}
 </script>
 
 <template>
@@ -36,11 +53,14 @@ async function update() {
 
       <br>
 
-      <span font-lg font-semibold>Questions</span>
+      <div flex items-center justify-between>
+        <span text-lg font-semibold>Questions</span>
+        <Button type="button" text label="Add question" @click="addQuestion" />
+      </div>
 
       <hr>
 
-      <Card v-for="(question, idx) in formData.schema" :key="question.title">
+      <Card v-for="(question, idx) in formData.schema" :key="idx">
         <template #content>
           <div flex gap3>
             <div class="flex flex-1 flex-col gap-2">
@@ -64,12 +84,18 @@ async function update() {
 
             <br>
             <div v-if="formData.schema[idx].type === 'mcq'" class="flex flex-1 flex-col gap-2">
-              <span mb2 font-semibold>Options</span>
-              <div v-for="(option, optionIdx) in formData.schema[idx].options" :key="option">
+              <div flex items-center justify-between>
+                <span mb2 font-semibold>Options</span>
+                <Button label="Add" size="small" @click="addOption(idx)" />
+              </div>
+              <div v-for="(option, optionIdx) in formData.schema[idx].options" :key="optionIdx" flex items-center>
                 <span mr4>
-                  {{ optionIdx + 1 }}
+                  {{ optionIdx + 1 }}.
                 </span>
                 <InputText v-model="formData.schema[idx].options[optionIdx]" />
+                <Button icon="" text rounded size="small" @click="deleteOption(idx, optionIdx)">
+                  <div i-tabler-trash text-red-600 />
+                </Button>
               </div>
             </div>
           </div>

@@ -1,0 +1,63 @@
+{
+  "name": "wsa-tollbooth",
+  "private": true,
+  "packageManager": "pnpm@8.6.7",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "postinstall": "prisma generate && nuxt prepare",
+    "lint": "eslint --cache .",
+    "lint:fix": "eslint --cache --fix .",
+    "preview": "nuxt preview",
+    "typecheck": "vue-tsc --noEmit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.39.7",
+    "@iconify-json/tabler": "^1.1.81",
+    "@nuxt/devtools": "latest",
+    "@prisma/client": "5.0.0",
+    "@qingu/vue-email": "^1.0.23",
+    "@trpc/client": "^10.34.0",
+    "@trpc/server": "^10.34.0",
+    "@types/node": "^20.4.2",
+    "@unocss/eslint-config": "^0.53.5",
+    "@unocss/nuxt": "^0.53.5",
+    "@vueuse/core": "^10.2.1",
+    "@vueuse/nuxt": "^10.2.1",
+    "consola": "^3.2.3",
+    "date-fns": "^2.30.0",
+    "date-fns-tz": "^2.0.0",
+    "eslint": "^8.44.0",
+    "lint-staged": "^13.2.3",
+    "nodemailer": "^6.9.3",
+    "nuxt": "^3.6.2",
+    "pinia": "^2.1.4",
+    "pino": "^8.14.1",
+    "pino-http": "^8.3.3",
+    "pino-pretty": "^10.0.1",
+    "primevue": "^3.30.0",
+    "prisma": "^5.0.0",
+    "resend": "^0.17.1",
+    "sass": "^1.63.6",
+    "simple-git-hooks": "^2.8.1",
+    "std-env": "^3.3.3",
+    "superjson": "^1.12.4",
+    "trpc-nuxt": "^0.10.6",
+    "vitepress": "1.0.0-beta.5",
+    "vue": "^3.3.4",
+    "vue-tsc": "^1.8.4",
+    "zod": "^3.21.4"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,vue,md}": [
+      "eslint --cache --fix"
+    ]
+  }
+}

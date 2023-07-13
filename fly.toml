@@ -1,0 +1,26 @@
+kill_signal = "SIGINT"
+kill_timeout = 5
+mounts = []
+primary_region = "sin"
+processes = []
+
+[build]
+dockerfile = "./Dockerfile"
+
+[[services]]
+internal_port = 3000
+processes = ["app"]
+protocol = "tcp"
+[services.concurrency]
+hard_limit = 1000
+soft_limit = 1000
+type = "connections"
+
+[[services.ports]]
+force_https = true
+handlers = ["http"]
+port = 80
+
+[[services.ports]]
+handlers = ["tls", "http"]
+port = 443

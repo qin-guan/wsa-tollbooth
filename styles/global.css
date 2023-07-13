@@ -1,0 +1,18 @@
+html,
+body,
+#__nuxt {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14.5px;
+  --at-apply: transition duration-100 ease-in-out;
+  --at-apply: font-sans  antialiased text-$text-color;
+  --at-apply: bg-$surface-ground;
+}
+
+* {
+  --at-apply: font-sans antialiased;
+}

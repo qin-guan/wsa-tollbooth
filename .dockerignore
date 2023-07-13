@@ -1,0 +1,11 @@
+node_modules
+*.log*
+.nuxt
+.nitro
+.cache
+.output
+#.env # Not ignoring this file because it can contain build-related settings.
+dist
+.DS_Store
+.eslintcache
+.idea

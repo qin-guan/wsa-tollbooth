@@ -3,7 +3,6 @@ import Avatar from 'primevue/avatar'
 import Menu from 'primevue/menu'
 
 const props = defineProps<{
-  avatarUrl: string | null
   name: string | null
 }>()
 const config = useRuntimeConfig()
@@ -11,9 +10,6 @@ const config = useRuntimeConfig()
 const menuVisible = ref(false)
 const menu = ref()
 const items = ref([
-  {
-    label: 'Profile',
-  },
   {
     label: 'Logout',
   },
@@ -33,9 +29,8 @@ function toggle(event: any) {
 
       <!-- For some reason, adding a chevron indicator breaks everything -->
       <div flex cursor-pointer items-center gap2 aria-haspopup="true" aria-controls="Dashboard__TheHeaderMenu">
-        <Avatar v-if="props.avatarUrl" :image="props.avatarUrl" shape="circle" />
         <Avatar
-          v-else-if="props.name" :label="props.name.slice(undefined, 1).toUpperCase()" shape="circle"
+          v-if="props.name" :label="props.name.slice(undefined, 1).toUpperCase()" shape="circle"
           @click="toggle"
         />
         <Avatar v-else label="U" shape="circle" />

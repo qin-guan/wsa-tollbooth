@@ -9,6 +9,10 @@ import { publicProcedure, router } from '../../trpc'
 import type { UserSessionData } from '../../../utils/session'
 import { VerificationCodeEmail } from '../../../emails/VerificationCodeEmail'
 
+const admins = [
+  'qinguan20040914@gmail.com',
+]
+
 export const emailSessionRouter = router({
   // Generate OTP.
   login: publicProcedure
@@ -82,8 +86,8 @@ export const emailSessionRouter = router({
         update: {},
         create: {
           email,
-          emailVerified: new Date(),
           name: email.split('@')[0],
+          admin: admins.includes(email),
         },
         select: defaultUserSelect,
       })

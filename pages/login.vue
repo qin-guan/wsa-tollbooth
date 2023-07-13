@@ -34,6 +34,7 @@ async function generateOtp() {
     formData.stage = 'otp'
   }
   catch (err) {
+    console.error(err)
     formData.error = (err as TRPCError).message
   }
   finally {
@@ -51,6 +52,7 @@ async function verifyOtp() {
     navigateTo('/dashboard')
   }
   catch (err) {
+    console.error(err)
     formData.error = (err as TRPCError).message
   }
   finally {

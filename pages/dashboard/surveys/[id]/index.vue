@@ -4,19 +4,30 @@ import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import Breadcrumb from 'primevue/breadcrumb'
 
 const { $client } = useNuxtApp()
 const route = useRoute()
 
 const { data } = await $client.survey.get.useQuery({ id: route.params.id as string })
+if (!data.value)
+  await navigateTo('/dashboard')
 
 const pending = ref(false)
-const formData = reactive(data.value)
+const formData = reactive(data.value ?? {})
 
 const options = [
   { name: 'Text', code: 'text' },
   { name: 'MCQ', code: 'mcq' },
 ]
+
+function printQR() {
+  navigateTo(`/dashboard/surveys/${route.params.id}/print`, { open: { target: '_blank' } })
+}
+
+function openAnalytics() {
+  navigateTo(`/dashboard/surveys/${route.params.id}/analytics`)
+}
 
 async function update() {
   pending.value = true
@@ -52,6 +63,27 @@ function deleteOption(questionIdx: number, optionIdx: number) {
 
 <template>
   <main mx-auto p-6 container>
+    <div flex justify-between>
+      <Breadcrumb
+        :home="{
+          to: '/',
+          label: 'Dashboard',
+        }" :model="[
+          {
+            label: 'Surveys',
+          },
+          {
+            label: `${formData.title}`,
+          },
+        ]"
+      />
+
+      <div>
+        <Button text label="Print QR" @click="printQR" />
+        <Button label="Analytics" severity="secondary" @click="openAnalytics" />
+      </div>
+    </div>
+
     <div my-6 border-red-600 rounded-md bg-red-500 bg-opacity-50 p-5>
       <span font-semibold>
         Warning!
@@ -61,6 +93,7 @@ function deleteOption(questionIdx: number, optionIdx: number) {
       <br>
       The type of a question should never be changed.
     </div>
+
     <form flex flex-col gap5 @submit.prevent="update">
       <div class="flex flex-col gap-2">
         <label for="title">Form title</label>
@@ -91,7 +124,10 @@ function deleteOption(questionIdx: number, optionIdx: number) {
 
             <div class="min-w-[150px] flex flex-col gap-2">
               <label :for="`type-${idx}`">Type</label>
-              <Dropdown :id="`type-${idx}`" v-model="formData.schema[idx].type" :options="options" option-label="name" option-value="code" placeholder="Question type" />
+              <Dropdown
+                :id="`type-${idx}`" v-model="formData.schema[idx].type" :options="options" option-label="name"
+                option-value="code" placeholder="Question type"
+              />
             </div>
           </div>
 

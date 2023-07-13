@@ -6,6 +6,7 @@ import Textarea from 'primevue/textarea'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
+import Badge from 'primevue/badge'
 
 const config = useRuntimeConfig()
 
@@ -85,8 +86,14 @@ async function create() {
     </div>
 
     <DataTable v-else :value="surveys" table-style="width: 100%;">
-      <Column field="id" header="ID" style="width: 25%;" />
+      <Column field="id" header="ID" style="width: 20%;" />
       <Column field="title" header="Title" style="width: 50%" />
+      <Column field="workshop" header="Type" style="width: 20%">
+        <template #body="slotProps">
+          <Badge v-if="slotProps.data.workshop" value="Workshop" />
+          <Badge v-else value="Booth" severity="warning" />
+        </template>
+      </Column>
       <Column header="Actions">
         <template #body="slotProps">
           <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">

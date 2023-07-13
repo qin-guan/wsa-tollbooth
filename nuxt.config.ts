@@ -4,6 +4,9 @@ export default defineNuxtConfig({
     componentIslands: true,
   },
   devtools: { enabled: true },
+  routeRules: {
+    '/dashboard/surveys/*/print': { ssr: false },
+  },
   modules: [
     '@unocss/nuxt',
     '@vueuse/nuxt',

@@ -27,7 +27,7 @@ export default defineNuxtConfig({
       // Nuxt generates wrong type for booleans but they work
       enableStorage: false,
       enableSgid: false,
-      appName: '@sagejs/starter-kit',
+      appName: 'WSA Tollbooth',
     },
 
     skipEnvValidation: false,

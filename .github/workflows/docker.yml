@@ -28,7 +28,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/sagejs/starter-kit
+            ghcr.io/qin-guan/wsa-tollbooth
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2

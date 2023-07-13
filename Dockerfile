@@ -1,7 +1,7 @@
 FROM docker.io/library/node:lts-alpine AS base
 
 # Prepare work directory
-WORKDIR /starter-kit
+WORKDIR /wsa-tollbooth
 
 FROM base AS builder
 
@@ -35,14 +35,14 @@ ARG GID=911
 
 # Create a dedicated user and group
 RUN set -eux; \
-    addgroup -g $GID starter-kit; \
-    adduser -u $UID -D -G starter-kit starter-kit;
+    addgroup -g $GID wsa-tollbooth; \
+    adduser -u $UID -D -G wsa-tollbooth wsa-tollbooth;
 
-USER starter-kit
+USER wsa-tollbooth
 
 ENV NODE_ENV=production
 
-COPY --from=builder /starter-kit/.output ./.output
+COPY --from=builder /wsa-tollbooth/.output ./.output
 
 EXPOSE 3000/tcp
 

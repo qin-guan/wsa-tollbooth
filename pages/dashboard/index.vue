@@ -105,7 +105,7 @@ async function create() {
 
     <br>
 
-    <Button size="small" label="Create new" @click="visible = true" />
+    <Button v-if="surveys.length === 0" size="small" label="Create new" @click="visible = true" />
   </main>
 </template>
 

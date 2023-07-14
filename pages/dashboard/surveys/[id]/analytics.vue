@@ -8,6 +8,7 @@ import Textarea from 'primevue/textarea'
 import Column from 'primevue/column'
 import Chart from 'primevue/chart'
 import RadioButton from 'primevue/radiobutton'
+import Skeleton from 'primevue/skeleton'
 
 const route = useRoute()
 const { $client } = useNuxtApp()
@@ -17,7 +18,7 @@ const responsePreview = reactive({
   idx: -1,
 })
 
-const { data } = await $client.analytics.listResponses.useQuery({ id: route.params.id as string })
+const { data, pending } = await $client.analytics.listResponses.useQuery({ id: route.params.id as string }, { lazy: true })
 const { data: allChartData } = await $client.analytics.chartResponses.useQuery({ id: route.params.id as string })
 </script>
 
@@ -72,7 +73,8 @@ const { data: allChartData } = await $client.analytics.chartResponses.useQuery({
 
     <TabView>
       <TabPanel header="Data table">
-        <DataTable :value="data.responses" table-class="w-full">
+        <Skeleton v-if="pending" />
+        <DataTable v-else :value="data.responses" table-class="w-full">
           <Column field="id" header="ID" />
           <Column field="timestamp" header="Timestamp" />
           <Column field="respondent.name" header="Respondent" />

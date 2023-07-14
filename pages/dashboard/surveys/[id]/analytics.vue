@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import RadioButton from 'primevue/radiobutton'
 import Dialog from 'primevue/dialog'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -7,6 +6,8 @@ import DataTable from 'primevue/datatable'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import Column from 'primevue/column'
+import Chart from 'primevue/chart'
+import RadioButton from 'primevue/radiobutton'
 
 const route = useRoute()
 const { $client } = useNuxtApp()
@@ -15,12 +16,9 @@ const responsePreview = reactive({
   visible: false,
   idx: -1,
 })
-const { data } = await $client.analytics.listResponses.useQuery({ id: route.params.id as string })
-// const qnData = computed(() => {
-//   return data.value.map((d) => d.data).reduce((acc, curr) => {
 
-//   }, [])
-// })
+const { data } = await $client.analytics.listResponses.useQuery({ id: route.params.id as string })
+const { data: allChartData } = await $client.analytics.chartResponses.useQuery({ id: route.params.id as string })
 </script>
 
 <template>
@@ -29,7 +27,13 @@ const { data } = await $client.analytics.listResponses.useQuery({ id: route.para
       <div flex flex-col divide-y divide-gray>
         <div v-for="(question, idx) in data.schema" :key="idx" flex flex-col gap3 py6>
           <span font-semibold>{{ question.title }}</span>
-          <div>
+
+          <div
+            v-if="
+              // @ts-expect-error This exists
+              data.responses[responsePreview.idx].data[idx]
+            "
+          >
             <Textarea
               v-if="question.type === 'text'" disabled :value="
                 // @ts-expect-error Answer exists on text type
@@ -50,6 +54,11 @@ const { data } = await $client.analytics.listResponses.useQuery({ id: route.para
                 <label :for="option" class="ml-2">{{ option }}</label>
               </div>
             </div>
+          </div>
+          <div v-else>
+            <span text-red-600>
+              No response as this question is new!
+            </span>
           </div>
         </div>
       </div>
@@ -77,7 +86,29 @@ const { data } = await $client.analytics.listResponses.useQuery({ id: route.para
         </DataTable>
       </TabPanel>
       <TabPanel header="Charts">
-        <div />
+        <div flex flex-col gap6>
+          <div
+            v-for="(qnChartData, idx) in allChartData"
+            :key="idx"
+          >
+            <div
+              v-if="qnChartData.labels.length > 0"
+            >
+              <span font-semibold>
+                {{ data.schema[idx].title }}
+              </span>
+              <Chart
+                type="bar" :data="qnChartData" :options="{
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                    },
+                  },
+                }"
+              />
+            </div>
+          </div>
+        </div>
       </TabPanel>
     </TabView>
   </main>

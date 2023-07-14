@@ -28,3 +28,4 @@ export const surveyResponseSchema = z.array(questionResponseSchema)
 
 export type QuestionResponseSchema = z.infer<typeof questionResponseSchema>
 export type SurveyResponseSchema = z.infer<typeof surveyResponseSchema>
+export type SurveySchema = z.infer<typeof surveySchema>

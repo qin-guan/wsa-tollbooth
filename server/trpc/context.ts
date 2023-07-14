@@ -1,6 +1,5 @@
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { H3Event } from 'h3'
-import { logger } from '../utils/logger'
 import { createSessionContext } from '../utils/session'
 
 /**
@@ -9,7 +8,7 @@ import { createSessionContext } from '../utils/session'
  */
 export function createContext(_event: H3Event) {
   // TODO better logging for this
-  logger(_event.node.req, _event.node.res)
+  // logger(_event.node.req, _event.node.res)
 
   const session = createSessionContext(_event)
 

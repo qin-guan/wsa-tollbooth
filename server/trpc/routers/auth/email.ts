@@ -12,6 +12,7 @@ import { VerificationCodeEmail } from '../../../emails/VerificationCodeEmail'
 const admins = [
   'qinguan20040914@gmail.com',
   'cattolation@protonmail.com',
+  's10223298@connect.np.edu.sg'
 ]
 
 export const emailSessionRouter = router({

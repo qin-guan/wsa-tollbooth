@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import { protectedProcedure, router } from '../../trpc'
+import { surveySchema } from '../../../../shared/survey'
 
 export const analyticsRouter = router({
   myResponses: protectedProcedure.query(async ({ ctx }) => {
@@ -18,10 +20,30 @@ export const analyticsRouter = router({
       id: z.string(),
     }),
   ).query(async ({ ctx, input }) => {
-    return await ctx.prisma.response.findMany({
+    const data = await ctx.prisma.survey.findUniqueOrThrow({
       where: {
-        surveyId: input.id,
+        id: input.id,
+      },
+      include: {
+        responses: {
+          include: {
+            respondent: true,
+          },
+        },
       },
     })
+
+    const result = await surveySchema.safeParseAsync(data.schema)
+    if (!result.success) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        cause: result.error,
+      })
+    }
+
+    return {
+      ...data,
+      schema: result.data,
+    }
   }),
 })

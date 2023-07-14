@@ -1,31 +1,40 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { Prisma } from '@prisma/client'
 import { adminProtectedProcedure, participantProtectedProcedure, router } from '../../trpc'
+import type { SurveySchema } from '~/shared/survey'
 import { surveyResponseSchema, surveySchema } from '~/shared/survey'
 
 export const surveyRouter = router({
   get: participantProtectedProcedure.input(z.object({
     id: z.string(),
   })).query(async ({ ctx, input }) => {
-    const [survey, submissionCount] = await Promise.all([
-      ctx.prisma.survey.findUniqueOrThrow({ where: { id: input.id } }),
-      ctx.prisma.response.count({
-        where: {
-          respondentId: ctx.session.user.id,
-          surveyId: input.id,
-        },
-      })])
-    const result = await surveySchema.safeParseAsync(survey.schema)
-    if (!result.success) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-      })
-    }
+    try {
+      const [survey, submissionCount] = await Promise.all([
+        ctx.prisma.survey.findUniqueOrThrow({ where: { id: input.id } }),
+        ctx.prisma.response.count({
+          where: {
+            respondentId: ctx.session.user.id,
+            surveyId: input.id,
+          },
+        })])
 
-    return {
-      ...survey,
-      schema: result.data,
-      submissionCount,
+      return {
+        ...survey,
+        schema: survey.schema as SurveySchema,
+        submissionCount,
+      }
+    }
+    catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Survey not found',
+            cause: err,
+          })
+        }
+      }
     }
   }),
 

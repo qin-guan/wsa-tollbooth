@@ -3,18 +3,32 @@ import Card from 'primevue/card'
 import Dropdown from 'primevue/dropdown'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
+import Skeleton from 'primevue/skeleton'
 import Button from 'primevue/button'
 import Breadcrumb from 'primevue/breadcrumb'
 
+import { useConfirm } from 'primevue/useconfirm'
+
 const { $client } = useNuxtApp()
 const route = useRoute()
+const confirm = useConfirm()
 
-const { data } = await $client.survey.get.useQuery({ id: route.params.id as string })
-if (!data.value)
-  await navigateTo('/dashboard')
+const {
+  data: survey,
+  pending: surveyPending,
+  error: surveyError,
+} = await $client.survey.get.useQuery(
+  { id: route.params.id as string },
+  { lazy: true },
+)
 
 const pending = ref(false)
-const formData = reactive(data.value ?? {})
+const formData = ref(survey.value)
+
+watch(survey, (value) => {
+  if (value)
+    formData.value = value
+})
 
 const options = [
   { name: 'Text', code: 'text' },
@@ -33,7 +47,7 @@ async function update() {
   pending.value = true
 
   try {
-    await $client.survey.update.mutate(formData)
+    await $client.survey.update.mutate(formData.value!)
   }
   catch (err) {
     console.error(err)
@@ -44,7 +58,7 @@ async function update() {
 }
 
 function addQuestion() {
-  formData.schema.push({
+  formData.value?.schema.push({
     title: '',
     description: '',
     type: 'text',
@@ -52,116 +66,158 @@ function addQuestion() {
   })
 }
 
+function deleteQuestion(event: any, questionIdx: number) {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to delete this question?',
+    acceptClass: 'p-button-danger',
+    accept: () => {
+      formData.value?.schema.splice(questionIdx, 1)
+    },
+    reject: () => {
+    },
+  })
+}
+
 function addOption(questionIdx: number) {
-  formData.schema[questionIdx].options.push('')
+  formData.value?.schema[questionIdx].options.push('')
 }
 
 function deleteOption(questionIdx: number, optionIdx: number) {
-  formData.schema[questionIdx].options.splice(optionIdx, 1)
+  formData.value?.schema[questionIdx].options.splice(optionIdx, 1)
 }
 </script>
 
 <template>
   <main mx-auto p-6 container>
-    <div flex justify-between>
-      <Breadcrumb
-        :home="{
-          to: '/',
-          label: 'Dashboard',
-        }" :model="[
-          {
-            label: 'Surveys',
-          },
-          {
-            label: `${formData.title}`,
-          },
-        ]"
-      />
-
-      <div>
-        <Button text label="Print QR" @click="printQR" />
-        <Button label="Analytics" severity="secondary" @click="openAnalytics" />
-      </div>
+    <div v-if="surveyPending" flex flex-col gap5>
+      <Skeleton height="50px" />
+      <Skeleton height="75px" />
+      <Skeleton height="300px" />
+      <Skeleton height="300px" />
     </div>
 
-    <div my-6 border-red-600 rounded-md bg-red-500 bg-opacity-50 p-5>
-      <span font-semibold>
-        Warning!
+    <div v-else-if="surveyError">
+      <span text-xl font-semibold>
+        {{ surveyError.message }}
       </span>
       <br>
-      Please take caution when editing a form after it has received responses. As much as possible, it should be avoided.
       <br>
-      The type of a question should never be changed.
+      <details>
+        {{ surveyError.data }}
+      </details>
     </div>
 
-    <form flex flex-col gap5 @submit.prevent="update">
-      <div class="flex flex-col gap-2">
-        <label for="title">Form title</label>
-        <InputText id="title" v-model="formData.title" />
+    <!-- formData should be populated when survey loads -->
+    <div v-if="formData">
+      <div flex flex-wrap items-center justify-between gap-3>
+        <Breadcrumb
+          :home="{
+            to: '/',
+            label: 'Dashboard',
+          }"
+          :model="[
+            {
+              label: 'Surveys',
+            },
+            {
+              label: `${formData.title}`,
+            },
+          ]"
+        />
+
+        <div flex gap3>
+          <Button text label="Print QR" @click="printQR" />
+          <Button label="Analytics" outline @click="openAnalytics" />
+        </div>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <label for="description">Form description</label>
-        <Textarea id="description" v-model="formData.description" />
+      <div my-6 border-red-600 rounded-md bg-red-500 bg-opacity-50 p-5>
+        <span font-semibold>
+          Warning!
+        </span>
+        <br>
+        Please take caution when editing a form after it has received responses. As much as possible, it should be avoided.
+        <br>
+        The type of a question should never be changed.
       </div>
 
-      <br>
+      <form flex flex-col gap5 @submit.prevent="update">
+        <div class="flex flex-col gap-2">
+          <label for="title">Form title</label>
+          <InputText id="title" v-model="formData.title" />
+        </div>
 
-      <div flex items-center justify-between>
-        <span text-lg font-semibold>Questions</span>
-        <Button type="button" text label="Add question" @click="addQuestion" />
-      </div>
+        <div class="flex flex-col gap-2">
+          <label for="description">Form description</label>
+          <Textarea id="description" v-model="formData.description" />
+        </div>
 
-      <hr>
+        <br>
 
-      <Card v-for="(_, idx) in formData.schema" :key="idx">
-        <template #content>
-          <div flex gap3>
-            <div class="flex flex-1 flex-col gap-2">
-              <label :for="`title-${idx}`">Title</label>
-              <InputText :id="`title-${idx}`" v-model="formData.schema[idx].title" />
-            </div>
+        <div flex items-center justify-between>
+          <span text-lg font-semibold>Questions</span>
+          <Button type="button" text label="Add question" @click="addQuestion" />
+        </div>
 
-            <div class="min-w-[150px] flex flex-col gap-2">
-              <label :for="`type-${idx}`">Type</label>
-              <Dropdown
-                :id="`type-${idx}`" v-model="formData.schema[idx].type" :options="options" option-label="name"
-                option-value="code" placeholder="Question type"
-              />
-            </div>
-          </div>
+        <hr>
 
-          <br>
-
-          <div>
-            <div class="flex flex-1 flex-col gap-2">
-              <label :for="`description-${idx}`">Description</label>
-              <Textarea :id="`description-${idx}`" v-model="formData.schema[idx].description" />
-            </div>
-
-            <br>
-            <div v-if="formData.schema[idx].type === 'mcq'" class="flex flex-1 flex-col gap-2">
-              <div flex items-center justify-between>
-                <span mb2 font-semibold>Options</span>
-                <Button label="Add" size="small" @click="addOption(idx)" />
+        <Card v-for="(_, idx) in formData.schema" :key="idx">
+          <template #content>
+            <div flex flex-wrap gap3>
+              <div class="flex flex-1 flex-col gap-2">
+                <label :for="`title-${idx}`">Title</label>
+                <InputText :id="`title-${idx}`" v-model="formData.schema[idx].title" />
               </div>
-              <div v-for="(_, optionIdx) in formData.schema[idx].options" :key="optionIdx" flex items-center>
-                <span mr4>
-                  {{ optionIdx + 1 }}.
-                </span>
-                <InputText v-model="formData.schema[idx].options[optionIdx]" />
-                <Button icon="" text rounded size="small" @click="deleteOption(idx, optionIdx)">
-                  <div i-tabler-trash text-red-600 />
+
+              <div class="min-w-[150px] flex flex-col gap-2">
+                <label :for="`type-${idx}`">Type</label>
+                <Dropdown
+                  :id="`type-${idx}`" v-model="formData.schema[idx].type" :options="options" option-label="name"
+                  option-value="code" placeholder="Question type"
+                />
+              </div>
+
+              <div>
+                <Button icon="" text @click="deleteQuestion($event, idx)">
+                  <div i-tabler-trash />
                 </Button>
               </div>
             </div>
-          </div>
-        </template>
-      </Card>
 
-      <div>
-        <Button type="submit" label="Save" :loading="pending" />
-      </div>
-    </form>
+            <br>
+
+            <div>
+              <div class="flex flex-1 flex-col gap-2">
+                <label :for="`description-${idx}`">Description</label>
+                <Textarea :id="`description-${idx}`" v-model="formData.schema[idx].description" />
+              </div>
+
+              <br>
+
+              <div v-if="formData.schema[idx].type === 'mcq'" class="flex flex-1 flex-col gap-2">
+                <div flex items-center justify-between>
+                  <span mb2 font-semibold>Options</span>
+                  <Button label="Add" size="small" @click="addOption(idx)" />
+                </div>
+                <div v-for="(_, optionIdx) in formData.schema[idx].options" :key="optionIdx" flex items-center>
+                  <span mr4>
+                    {{ optionIdx + 1 }}.
+                  </span>
+                  <InputText v-model="formData.schema[idx].options[optionIdx]" />
+                  <Button icon="" text rounded size="small" @click="deleteOption(idx, optionIdx)">
+                    <div i-tabler-trash text-red-600 />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </Card>
+
+        <div>
+          <Button type="submit" label="Save" :loading="pending" />
+        </div>
+      </form>
+    </div>
   </main>
 </template>

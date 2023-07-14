@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ConfirmPopup from 'primevue/confirmpopup'
 import Toast from 'primevue/toast'
 
 const cookieRaw = useCookie('theme')
@@ -20,6 +21,7 @@ const resolvedTheme = computed(() => {
       <link rel="stylesheet" :href="resolvedTheme">
     </Head>
     <Toast />
+    <ConfirmPopup />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

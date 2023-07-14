@@ -25,36 +25,30 @@ export default defineNuxtConfig({
       'trpc-nuxt',
     ],
   },
+
+  htmlValidator: {
+    failOnError: true,
+    options: {
+      rules: {
+        'wcag/h37': 'warn',
+        'element-permitted-content': 'warn',
+        'element-required-attributes': 'warn',
+        'attribute-empty-style': 'off',
+      },
+    },
+  },
+
   runtimeConfig: {
     public: {
-      // Nuxt generates wrong type for booleans but they work
-      enableStorage: false,
-      enableSgid: false,
-      appName: 'WSA Tollbooth',
+      appName: 'World Skills ASEAN',
     },
 
     skipEnvValidation: false,
     databaseUrl: '',
     otpExpiry: 600,
 
-    postmanApiKey: '',
     sessionSecret: '',
     sessionName: 'h3',
-
-    r2: {
-      accessKeyId: '',
-      accountId: '',
-      secretAccessKey: '',
-      publicHostname: '',
-      avatarsBucketName: '',
-    },
-
-    sgid: {
-      clientId: '',
-      clientSecret: '',
-      privateKey: '',
-      redirectUri: '',
-    },
 
     resend: {
       apiKey: '',

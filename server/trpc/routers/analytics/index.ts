@@ -17,7 +17,8 @@ export const analyticsRouter = router({
         },
       },
     })
-    return data?.surveyResponses
+
+    return data.surveyResponses
   }),
 
   listResponses: adminProtectedProcedure.input(

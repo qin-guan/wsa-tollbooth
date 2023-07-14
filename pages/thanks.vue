@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Skeleton from 'primevue/skeleton'
 import InputMask from 'primevue/inputmask'
 import Card from 'primevue/card'
 import Badge from 'primevue/badge'
@@ -11,28 +12,46 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { $client } = useNuxtApp()
 const config = useRuntimeConfig()
 
 const toast = useToast()
+const { $client } = useNuxtApp()
 
-const { data } = await $client.analytics.myResponses.useQuery()
-const { data: survey } = await $client.survey.get.useQuery({ id: route.query.id as string })
-const { data: me } = await $client.me.get.useQuery()
+const [
+  { data: responses, pending: responsesPending },
+  { data: survey, pending: surveyPending },
+  { data: me },
+] = [
+  $client.analytics.myResponses.useQuery(undefined, { lazy: true }),
+  $client.survey.get.useQuery({ id: route.query.id as string }, { lazy: true }),
+  $client.me.get.useQuery(undefined, { lazy: true }),
+]
 
 const eligibleForLuckyDraw = computed(() => {
-  if (data.value.length > 1)
+  if (responsesPending)
+    return false
+
+  if (responses.value.length > 1)
     return true
-  if (data.value.find(x => x.survey.workshop))
+  if (responses.value.find(x => x.survey.workshop))
     return true
+
   return false
 })
 
 const formData = reactive({
-  name: me.value.name ?? '',
-  nric: me.value.nric ?? '',
-  phone: me.value.phone ?? '',
+  name: '',
+  nric: '',
+  phone: '',
   pending: false,
+})
+
+watch(me, (value) => {
+  if (value) {
+    formData.name = value.name ?? ''
+    formData.nric = value.nric ?? ''
+    formData.phone = value.phone ?? ''
+  }
 })
 
 async function create() {
@@ -66,16 +85,20 @@ async function create() {
         <span class="font-semibold">{{ config.public.appName }}</span>
       </NuxtLink>
     </header>
+
     <main flex flex-col gap10>
-      <section flex flex-col>
-        <h1 v-if="survey" text-5xl font-bold>
-          Thanks for filling up {{ survey.title }}
-        </h1>
-        <h1 v-else text-5xl font-bold>
-          Thanks for coming to World Skills ASEAN 2023!
-        </h1>
-        <span mt3 text-lg>
-          Feel free to explore our other booths!
+      <section>
+        <Skeleton v-if="surveyPending" />
+        <span v-else flex flex-col>
+          <h1 v-if="survey" text-5xl font-bold>
+            Thanks for filling up {{ survey.title }}
+          </h1>
+          <h1 v-else text-5xl font-bold>
+            Thanks for coming to World Skills ASEAN 2023!
+          </h1>
+          <span mt3 text-lg>
+            Feel free to explore our other booths!
+          </span>
         </span>
       </section>
 
@@ -120,8 +143,14 @@ async function create() {
           Your completed surveys
         </h2>
 
-        <div mt6 grid="~ cols-1 md:cols-2 lg:cols-3 gap-3">
-          <div v-for="response in data" :key="response.id" class="rounded-lg bg-$surface-card p-3">
+        <Skeleton v-if="responsesPending" />
+
+        <div v-else-if="responses.length === 0" class="mt3 flex justify-center rounded-lg bg-$surface-card px4 py20">
+          <span text-center text-xl>No surveys completed.</span>
+        </div>
+
+        <div v-else mt6 grid="~ cols-1 md:cols-2 lg:cols-3 gap-3">
+          <div v-for="response in responses" :key="response.id" class="rounded-lg bg-$surface-card p-3">
             <div flex items-center justify-between>
               <span text-xl font-semibold>
                 {{ response.survey.title }}

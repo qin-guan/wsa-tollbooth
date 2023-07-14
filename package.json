@@ -19,6 +19,7 @@
     "@antfu/eslint-config": "^0.39.7",
     "@iconify-json/tabler": "^1.1.81",
     "@nuxt/devtools": "latest",
+    "@nuxtjs/html-validator": "^1.5.1",
     "@prisma/client": "5.0.0",
     "@qingu/vue-email": "^1.0.23",
     "@trpc/client": "^10.34.0",

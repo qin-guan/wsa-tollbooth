@@ -6,5 +6,5 @@ export default defineNuxtRouteMiddleware(async () => {
     return '/login'
 
   if (!data.value.admin)
-    return '/oops'
+    return '/thanks'
 })

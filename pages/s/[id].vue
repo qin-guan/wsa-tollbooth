@@ -6,8 +6,7 @@ import Textarea from 'primevue/textarea'
 import type { SurveyResponseSchema } from '~/shared/survey'
 
 definePageMeta({
-  middleware: ['auth', () => {
-  }],
+  middleware: ['participant'],
 })
 
 const config = useRuntimeConfig()

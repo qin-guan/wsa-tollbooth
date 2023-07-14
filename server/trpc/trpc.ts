@@ -15,18 +15,49 @@ const t = initTRPC.context<Context>().create({
   transformer: superjson,
 })
 
-const authMiddleware = t.middleware(async ({ next, ctx }) => {
+const adminAuthMiddleware = t.middleware(async ({ next, ctx }) => {
   const session = await ctx.session.get()
   if (!session.data.id)
     throw new TRPCError({ code: 'UNAUTHORIZED' })
 
   // this code path is needed if a user does not exist in the database as they were deleted, but the session was active before
   const user = await prisma.user.findUnique({
-    where: { id: session.data.id },
+    where: { id: session.data.id, admin: true },
   })
 
   if (user === null)
     throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+  return next({
+    ctx: {
+      session: {
+        user,
+      },
+    },
+  })
+})
+
+const temporarySessionMiddleware = t.middleware(async ({ next, ctx }) => {
+  const session = await ctx.session.get()
+
+  let user
+  if (session.data.id) {
+    user = await prisma.user.findUniqueOrThrow({
+      where: { id: session.data.id },
+    })
+  }
+  else {
+    user = await ctx.prisma.user.create({
+      data: {
+        admin: false,
+      },
+    })
+  }
+
+  await ctx.session.update({
+    id: user.id,
+  })
+  await ctx.session.seal()
 
   return next({
     ctx: {
@@ -45,8 +76,11 @@ export const publicProcedure = t.procedure
 /**
  * Create a protected procedure
  **/
-export const protectedProcedure = t.procedure
-  .use(authMiddleware)
+export const adminProtectedProcedure = t.procedure
+  .use(adminAuthMiddleware)
+
+export const participantProtectedProcedure = t.procedure
+  .use(temporarySessionMiddleware)
 
 export const router = t.router
 export const middleware = t.middleware

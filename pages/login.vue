@@ -3,10 +3,6 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import type { TRPCError } from '@trpc/server'
 
-definePageMeta({
-  middleware: ['guest'],
-})
-
 const config = useRuntimeConfig()
 const { $client } = useNuxtApp()
 

@@ -1,21 +1,26 @@
 import { z } from 'zod'
-import { protectedProcedure, router } from '../../trpc'
+import { adminProtectedProcedure, participantProtectedProcedure, router } from '../../trpc'
 import type { SurveyResponseSchema, SurveySchema } from '../../../../shared/survey'
 
 // TODO probably need a better name for all the functions here
 export const analyticsRouter = router({
-  myResponses: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.survey.findMany({
+  myResponses: participantProtectedProcedure.query(async ({ ctx }) => {
+    const data = await ctx.prisma.user.findUniqueOrThrow({
       where: {
-        responses: {
-          every: {
-            respondentId: ctx.session.user.id,
+        id: ctx.session.user.id,
+      },
+      include: {
+        surveyResponses: {
+          include: {
+            survey: true,
           },
         },
       },
     })
+    return data?.surveyResponses
   }),
-  listResponses: protectedProcedure.input(
+
+  listResponses: adminProtectedProcedure.input(
     z.object({
       id: z.string(),
     }),
@@ -38,7 +43,8 @@ export const analyticsRouter = router({
       schema: data.schema as SurveySchema,
     }
   }),
-  chartResponses: protectedProcedure.input(
+
+  chartResponses: adminProtectedProcedure.input(
     z.object({
       id: z.string(),
     }),

@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { protectedProcedure, router } from '../../trpc'
+import { adminProtectedProcedure, participantProtectedProcedure, router } from '../../trpc'
 import { surveyResponseSchema, surveySchema } from '~/shared/survey'
 
 export const surveyRouter = router({
-  get: protectedProcedure.input(z.object({
+  get: participantProtectedProcedure.input(z.object({
     id: z.string(),
   })).query(async ({ ctx, input }) => {
     const [survey, submissionCount] = await Promise.all([
@@ -28,42 +28,8 @@ export const surveyRouter = router({
       submissionCount,
     }
   }),
-  list: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.session.user.admin) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-      })
-    }
 
-    return await ctx.prisma.survey.findMany()
-  }),
-  create: protectedProcedure.input(
-    z.object({
-      title: z.string(),
-      description: z.string(),
-      workshop: z.boolean(),
-      schema: surveySchema,
-    }),
-  ).mutation(async ({ ctx, input }) => {
-    return await ctx.prisma.survey.create({
-      data: input,
-    })
-  }),
-  update: protectedProcedure.input(
-    z.object({
-      id: z.string(),
-      title: z.string(),
-      description: z.string(),
-      workshop: z.boolean(),
-      schema: surveySchema,
-    }),
-  ).mutation(async ({ ctx, input }) => {
-    return await ctx.prisma.survey.update({
-      where: { id: input.id },
-      data: input,
-    })
-  }),
-  respond: protectedProcedure.input(z.object({
+  respond: participantProtectedProcedure.input(z.object({
     id: z.string(),
     data: surveyResponseSchema,
   })).mutation(async ({ ctx, input }) => {
@@ -79,6 +45,44 @@ export const surveyRouter = router({
       where: {
         respondentId: ctx.session.user.id,
       },
+    })
+  }),
+
+  list: adminProtectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.session.user.admin) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+      })
+    }
+
+    return await ctx.prisma.survey.findMany()
+  }),
+
+  create: adminProtectedProcedure.input(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      workshop: z.boolean(),
+      schema: surveySchema,
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    return await ctx.prisma.survey.create({
+      data: input,
+    })
+  }),
+
+  update: adminProtectedProcedure.input(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string(),
+      workshop: z.boolean(),
+      schema: surveySchema,
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    return await ctx.prisma.survey.update({
+      where: { id: input.id },
+      data: input,
     })
   }),
 })

@@ -21,7 +21,12 @@ model VerificationToken {
 model User {
   id    String  @id @default(cuid())
   name  String?
-  email String  @unique
+  email String? // Mandatory for admins
+
+  // For participants
+  nric  String?
+  phone String?
+
   admin Boolean
 
   surveyResponses Response[]
@@ -46,4 +51,6 @@ model Response {
   surveyId     String
   respondent   User   @relation(fields: [respondentId], references: [id])
   respondentId String
+
+  @@unique([surveyId, respondentId])
 }

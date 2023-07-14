@@ -84,15 +84,30 @@ export const emailSessionRouter = router({
         throw e
       }
 
-      const user = await ctx.prisma.user.upsert({
+      let user = await ctx.prisma.user.findFirst({
         where: { email },
-        update: {},
-        create: {
-          email,
-          name: email.split('@')[0],
-          admin: admins.includes(email),
-        },
-        select: defaultUserSelect,
+      })
+
+      const data = {
+        email,
+        name: email.split('@')[0],
+        admin: admins.includes(email),
+      }
+      if (user === null) {
+        await ctx.prisma.user.create({
+          data,
+          select: defaultUserSelect,
+        })
+      }
+      else {
+        await ctx.prisma.user.update({
+          where: { id: user.id },
+          data,
+        })
+      }
+
+      user = await ctx.prisma.user.findFirstOrThrow({
+        where: { email },
       })
 
       await ctx.session.update<UserSessionData>({

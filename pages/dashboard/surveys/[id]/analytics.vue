@@ -8,7 +8,6 @@ import Textarea from 'primevue/textarea'
 import Column from 'primevue/column'
 import Chart from 'primevue/chart'
 import RadioButton from 'primevue/radiobutton'
-import Skeleton from 'primevue/skeleton'
 
 const route = useRoute()
 const { $client } = useNuxtApp()
@@ -18,7 +17,7 @@ const responsePreview = reactive({
   idx: -1,
 })
 
-const { data, pending } = await $client.analytics.listResponses.useQuery({ id: route.params.id as string }, { lazy: true })
+const { data } = await $client.analytics.listResponses.useQuery({ id: route.params.id as string })
 const { data: allChartData } = await $client.analytics.chartResponses.useQuery({ id: route.params.id as string })
 </script>
 
@@ -73,11 +72,19 @@ const { data: allChartData } = await $client.analytics.chartResponses.useQuery({
 
     <TabView>
       <TabPanel header="Data table">
-        <Skeleton v-if="pending" />
-        <DataTable v-else :value="data.responses" table-class="w-full">
+        <DataTable :value="data.responses" table-class="w-full">
           <Column field="id" header="ID" />
           <Column field="timestamp" header="Timestamp" />
-          <Column field="respondent.name" header="Respondent" />
+          <Column header="Respondent">
+            <template #body="bodySlot">
+              <span v-if="bodySlot.data.respondent.name">
+                {{ bodySlot.data.respondent.name }}
+              </span>
+              <span v-else>
+                Unregistered
+              </span>
+            </template>
+          </Column>
           <Column header="Expand">
             <template #body="bodySlot">
               <Button icon="" link @click="responsePreview.idx = bodySlot.index; responsePreview.visible = true">

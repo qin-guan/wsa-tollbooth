@@ -3,10 +3,6 @@ import Button from 'primevue/button'
 
 const config = useRuntimeConfig()
 
-definePageMeta({
-  middleware: ['guest'],
-})
-
 useSeoMeta({
   title: config.public.appName,
 })

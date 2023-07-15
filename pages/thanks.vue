@@ -90,15 +90,11 @@ async function create() {
 
 <template>
   <div p-6 lg:px-30>
-    <header
-      class="h-24 flex items-center justify-between"
-    >
-      <NuxtLink to="/">
-        <span class="font-semibold">{{ config.public.appName }}</span>
-      </NuxtLink>
-    </header>
-
     <main flex flex-col gap10>
+      <div>
+        <NuxtImg preload height="135px" width="auto" densities="x1 x2 x3" src="/images/logo.webp" />
+      </div>
+
       <section>
         <Skeleton v-if="surveyPending" />
         <span v-else flex flex-col>

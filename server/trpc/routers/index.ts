@@ -5,6 +5,7 @@ import { meRouter } from './me'
 import { surveyRouter } from './survey'
 import { analyticsRouter } from './analytics'
 import { responseRouter } from './response'
+import { luckyDrawRouter } from './luckydraw'
 
 export const appRouter = router({
   hello: publicProcedure
@@ -23,6 +24,7 @@ export const appRouter = router({
   survey: surveyRouter,
   response: responseRouter,
   analytics: analyticsRouter,
+  luckyDraw: luckyDrawRouter,
   me: meRouter,
 })
 

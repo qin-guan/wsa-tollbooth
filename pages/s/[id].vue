@@ -27,6 +27,8 @@ const formData = ref<SurveyResponseSchema | null>(null)
 
 const pending = ref(false)
 watch(responses, async (value) => {
+  if (!value)
+    return
   if (value.find(v => v.surveyId === route.params.id)) {
     await navigateTo({
       path: '/thanks',

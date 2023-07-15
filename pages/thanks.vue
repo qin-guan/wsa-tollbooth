@@ -39,6 +39,12 @@ const eligibleForLuckyDraw = computed(() => {
 })
 
 const progresses = computed(() => {
+  if (!responses.value) {
+    return {
+      booths: 0,
+      workshops: 0,
+    }
+  }
   return {
     booths: responses.value.filter(x => !x.survey.workshop).length / 2 * 100,
     workshops: responses.value.filter(x => x.survey.workshop).length / 1 * 100,

@@ -96,19 +96,13 @@ async function submit() {
 
 <template>
   <div p-6 lg:px-30>
-    <header
-      class="h-24 flex items-center justify-between"
-    >
-      <NuxtLink to="/">
-        <span class="font-semibold">{{ config.public.appName }}</span>
-      </NuxtLink>
-    </header>
-
     <main>
       <DashboardError v-if="surveyError" v-bind="surveyError" />
       <template v-else-if="survey">
-        <div mx-auto mt-3 max-w-3xl container>
-          <div>
+        <div mx-auto max-w-3xl container>
+          <NuxtImg preload height="135px" src="/images/logo.webp" />
+
+          <div mt10>
             <h1 text-5xl font-bold>
               {{ survey.title }}
             </h1>

@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@vueuse/nuxt',
     '@nuxtjs/html-validator',
+    '@nuxt/image',
   ],
   typescript: {
     strict: true,
@@ -41,6 +42,8 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  image: {},
 
   runtimeConfig: {
     public: {

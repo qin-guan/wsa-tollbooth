@@ -2,6 +2,13 @@
 import ConfirmPopup from 'primevue/confirmpopup'
 import Toast from 'primevue/toast'
 
+const config = useRuntimeConfig()
+useHead({
+  titleTemplate: (titleChunk) => {
+    return titleChunk ? `${config.public.appName} - ${titleChunk}` : config.public.appName
+  },
+})
+
 const cookieRaw = useCookie('theme')
 const route = useRoute()
 const resolvedTheme = computed(() => {

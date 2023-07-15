@@ -1,28 +1,26 @@
-import { z } from 'zod'
-import { TRPCError } from '@trpc/server'
 import { Prisma } from '@prisma/client'
-import { adminProtectedProcedure, participantProtectedProcedure, router } from '../../trpc'
-import type { SurveySchema } from '~/shared/survey'
-import { surveyResponseSchema, surveySchema } from '~/shared/survey'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
+import type { SurveySchema } from '../../../../shared/survey'
+import { surveySchema } from '../../../../shared/survey'
+import { protectedProcedure, router } from '../../trpc'
 
 export const surveyRouter = router({
-  get: participantProtectedProcedure.input(z.object({
-    id: z.string(),
-  })).query(async ({ ctx, input }) => {
+  get: protectedProcedure.meta({ participants: true }).input(
+    z.object({
+      id: z.string(),
+    }),
+  ).query(async ({ ctx, input }) => {
     try {
-      const [survey, submissionCount] = await Promise.all([
-        ctx.prisma.survey.findUniqueOrThrow({ where: { id: input.id } }),
-        ctx.prisma.response.count({
-          where: {
-            respondentId: ctx.session.user.id,
-            surveyId: input.id,
-          },
-        })])
+      const survey = await ctx.prisma.survey.findUniqueOrThrow({
+        where: {
+          id: input.id,
+        },
+      })
 
       return {
         ...survey,
         schema: survey.schema as SurveySchema,
-        submissionCount,
       }
     }
     catch (err) {
@@ -38,36 +36,11 @@ export const surveyRouter = router({
     }
   }),
 
-  respond: participantProtectedProcedure.input(z.object({
-    id: z.string(),
-    data: surveyResponseSchema,
-  })).mutation(async ({ ctx, input }) => {
-    await ctx.prisma.response.create({
-      data: {
-        surveyId: input.id,
-        respondentId: ctx.session.user.id,
-        data: input.data,
-      },
-    })
-
-    return ctx.prisma.response.count({
-      where: {
-        respondentId: ctx.session.user.id,
-      },
-    })
-  }),
-
-  list: adminProtectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.session.user.admin) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-      })
-    }
-
+  list: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.survey.findMany()
   }),
 
-  create: adminProtectedProcedure.input(
+  create: protectedProcedure.input(
     z.object({
       title: z.string(),
       description: z.string(),
@@ -80,7 +53,7 @@ export const surveyRouter = router({
     })
   }),
 
-  update: adminProtectedProcedure.input(
+  update: protectedProcedure.input(
     z.object({
       id: z.string(),
       title: z.string(),

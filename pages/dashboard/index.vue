@@ -7,15 +7,14 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import InputSwitch from 'primevue/inputswitch'
 import Badge from 'primevue/badge'
-
-const config = useRuntimeConfig()
+import Skeleton from 'primevue/skeleton'
 
 useSeoMeta({
-  title: config.public.appName,
+  title: 'Dashboard',
 })
 
 const { $client } = useNuxtApp()
-const { data: surveys } = await $client.survey.list.useQuery()
+const { data: surveys, pending: surveysPending, error: surveysError } = await $client.survey.list.useQuery(undefined, { lazy: true })
 
 const visible = ref(false)
 const createForm = reactive({
@@ -79,33 +78,38 @@ async function create() {
 
     <br>
 
-    <div v-if="surveys.length === 0" mt-20 flex flex-col items-center>
-      <span text-xl font-semibold>No surveys</span>
+    <Skeleton v-if="surveysPending" height="300px" />
+    <DashboardError v-else-if="surveysError" v-bind="surveysError" />
+
+    <template v-else>
+      <div v-if="surveys.length === 0" mt-20 flex flex-col items-center>
+        <span text-xl font-semibold>No surveys</span>
+        <br>
+        <Button size="small" label="Create new" @click="visible = true" />
+      </div>
+
+      <DataTable v-else :value="surveys" table-style="width: 100%;">
+        <Column field="id" header="ID" style="width: 20%;" />
+        <Column field="title" header="Title" style="width: 50%" />
+        <Column field="workshop" header="Type" style="width: 20%">
+          <template #body="slotProps">
+            <Badge v-if="slotProps.data.workshop" value="Workshop" />
+            <Badge v-else value="Booth" severity="warning" />
+          </template>
+        </Column>
+        <Column header="Actions">
+          <template #body="slotProps">
+            <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">
+              <Button label="Edit" size="small" link />
+            </NuxtLink>
+          </template>
+        </Column>
+      </DataTable>
+
       <br>
-      <Button size="small" label="Create new" @click="visible = true" />
-    </div>
 
-    <DataTable v-else :value="surveys" table-style="width: 100%;">
-      <Column field="id" header="ID" style="width: 20%;" />
-      <Column field="title" header="Title" style="width: 50%" />
-      <Column field="workshop" header="Type" style="width: 20%">
-        <template #body="slotProps">
-          <Badge v-if="slotProps.data.workshop" value="Workshop" />
-          <Badge v-else value="Booth" severity="warning" />
-        </template>
-      </Column>
-      <Column header="Actions">
-        <template #body="slotProps">
-          <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">
-            <Button label="Edit" size="small" link />
-          </NuxtLink>
-        </template>
-      </Column>
-    </DataTable>
-
-    <br>
-
-    <Button v-if="surveys.length === 0" size="small" label="Create new" @click="visible = true" />
+      <Button v-if="surveys.length !== 0" size="small" label="Create new" @click="visible = true" />
+    </template>
   </main>
 </template>
 

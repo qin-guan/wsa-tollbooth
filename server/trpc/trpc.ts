@@ -11,53 +11,49 @@ import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import type { Context } from '~/server/trpc/context'
 
-const t = initTRPC.context<Context>().create({
-  transformer: superjson,
-})
+interface Meta {
+  // Accessible by participants
+  participants: boolean
+}
 
-const adminAuthMiddleware = t.middleware(async ({ next, ctx }) => {
-  const session = await ctx.session.get()
-  if (!session.data.id)
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-  // this code path is needed if a user does not exist in the database as they were deleted, but the session was active before
-  const user = await prisma.user.findUnique({
-    where: { id: session.data.id, admin: true },
-  })
-
-  if (user === null)
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-  return next({
-    ctx: {
-      session: {
-        user,
-      },
+const t = initTRPC
+  .context<Context>()
+  .meta<Meta>()
+  .create({
+    transformer: superjson,
+    defaultMeta: {
+      participants: false,
     },
   })
-})
 
-const temporarySessionMiddleware = t.middleware(async ({ next, ctx }) => {
-  const session = await ctx.session.get()
+const authMiddleware = t.middleware(async (opts) => {
+  const { next, ctx, meta } = opts
 
   let user
-  if (session.data.id) {
-    user = await prisma.user.findUniqueOrThrow({
-      where: { id: session.data.id },
-    })
-  }
-  else {
+  if (!ctx.session.data.id) {
+    if (!meta?.participants)
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+
     user = await ctx.prisma.user.create({
       data: {
         admin: false,
       },
     })
-  }
 
-  await ctx.session.update({
-    id: user.id,
-  })
-  await ctx.session.seal()
+    await ctx.session.update({
+      id: user.id,
+    })
+  }
+  else {
+    user = await prisma.user.findUnique({
+      where: { id: ctx.session.data.id },
+    })
+    if (user === null)
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+    if (!meta?.participants && !user.admin)
+      throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
 
   return next({
     ctx: {
@@ -76,11 +72,8 @@ export const publicProcedure = t.procedure
 /**
  * Create a protected procedure
  **/
-export const adminProtectedProcedure = t.procedure
-  .use(adminAuthMiddleware)
-
-export const participantProtectedProcedure = t.procedure
-  .use(temporarySessionMiddleware)
+export const protectedProcedure = t.procedure
+  .use(authMiddleware)
 
 export const router = t.router
 export const middleware = t.middleware

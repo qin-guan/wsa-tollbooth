@@ -22,6 +22,10 @@ const {
   { lazy: true },
 )
 
+useSeoMeta({
+  title: survey.value?.title ?? 'Loading...',
+})
+
 const pending = ref(false)
 const formData = ref(survey.value)
 
@@ -35,12 +39,16 @@ const options = [
   { name: 'MCQ', code: 'mcq' },
 ]
 
-function printQR() {
-  navigateTo(`/dashboard/surveys/${route.params.id}/print`, { open: { target: '_blank' } })
+async function printQR() {
+  await navigateTo(`/dashboard/surveys/${route.params.id}/print`, { open: { target: '_blank' } })
 }
 
-function openAnalytics() {
-  navigateTo(`/dashboard/surveys/${route.params.id}/analytics`)
+async function openAnalytics() {
+  await navigateTo(`/dashboard/surveys/${route.params.id}/analytics`)
+}
+
+async function openPreview() {
+  await navigateTo(`/s/${route.params.id}`)
 }
 
 async function update() {
@@ -97,28 +105,20 @@ function deleteOption(questionIdx: number, optionIdx: number) {
       <Skeleton height="300px" />
     </div>
 
-    <div v-else-if="surveyError">
-      <span text-xl font-semibold>
-        {{ surveyError.message }}
-      </span>
-      <br>
-      <br>
-      <details>
-        {{ surveyError.data }}
-      </details>
-    </div>
+    <DashboardError v-else-if="surveyError" v-bind="surveyError" />
 
     <!-- formData should be populated when survey loads -->
-    <div v-if="formData">
+    <div v-else-if="formData">
       <div flex flex-wrap items-center justify-between gap-3>
         <Breadcrumb
           :home="{
-            to: '/',
+            to: '/dashboard',
             label: 'Dashboard',
           }"
           :model="[
             {
               label: 'Surveys',
+              to: '/dashboard',
             },
             {
               label: `${formData.title}`,
@@ -127,8 +127,15 @@ function deleteOption(questionIdx: number, optionIdx: number) {
         />
 
         <div flex gap3>
-          <Button text label="Print QR" @click="printQR" />
-          <Button label="Analytics" outline @click="openAnalytics" />
+          <div>
+            <Button text label="Preview" :pt="{ root: { class: 'p2!' } }" @click="openPreview" />
+          </div>
+          <div>
+            <Button text label="Print QR" :pt="{ root: { class: 'p2!' } }" @click="printQR" />
+          </div>
+          <div>
+            <Button label="Analytics" outline :pt="{ root: { class: 'p2!' } }" @click="openAnalytics" />
+          </div>
         </div>
       </div>
 
@@ -198,7 +205,7 @@ function deleteOption(questionIdx: number, optionIdx: number) {
               <div v-if="formData.schema[idx].type === 'mcq'" class="flex flex-1 flex-col gap-2">
                 <div flex items-center justify-between>
                   <span mb2 font-semibold>Options</span>
-                  <Button label="Add" size="small" @click="addOption(idx)" />
+                  <Button label="Add" :pt="{ root: { class: 'p2!' } }" @click="addOption(idx)" />
                 </div>
                 <div v-for="(_, optionIdx) in formData.schema[idx].options" :key="optionIdx" flex items-center>
                   <span mr4>
@@ -215,7 +222,7 @@ function deleteOption(questionIdx: number, optionIdx: number) {
         </Card>
 
         <div>
-          <Button type="submit" label="Save" :loading="pending" />
+          <Button type="submit" label="Save" severity="success" :pt="{ root: { class: 'p2!' } }" :loading="pending" />
         </div>
       </form>
     </div>

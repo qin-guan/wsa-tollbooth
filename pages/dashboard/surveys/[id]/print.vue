@@ -14,12 +14,16 @@ const qrcode = useQRCode(data.value, {
 })
 
 const { data: survey } = await $client.survey.get.useQuery({ id: route.params.id as string })
+
+useSeoMeta({
+  title: survey.value?.title ?? 'Loading...',
+})
 </script>
 
 <template>
   <div class="h-4/5 flex flex-col items-center justify-center">
     <h1 class="text-6xl font-bold">
-      {{ survey.title }}
+      {{ survey?.title }}
     </h1>
     <br>
     <img :src="qrcode" :alt="data" style="width: 500px">

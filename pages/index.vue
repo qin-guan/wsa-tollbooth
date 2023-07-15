@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import Button from 'primevue/button'
 
+const { $client } = useNuxtApp()
 const config = useRuntimeConfig()
 
-useSeoMeta({
-  title: config.public.appName,
-})
+const { data: me } = await $client.me.get.useQuery(undefined, { lazy: true })
 
 function docs() {
   window.open('https://start-docs.qinguan.me', '_target')
@@ -20,7 +19,9 @@ function docs() {
       <NuxtLink to="/">
         <span class="font-semibold">{{ config.public.appName }}</span>
       </NuxtLink>
-      <Button label="Log in" @click="$router.push('login')" />
+
+      <Button v-if="me && me.admin" label="Dashboard" @click="$router.push('dashboard')" />
+      <Button v-else label="Login" @click="$router.push('login')" />
     </header>
     <main>
       <section

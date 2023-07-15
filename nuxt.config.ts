@@ -1,8 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  experimental: {
-    componentIslands: true,
-  },
   devtools: { enabled: true },
   routeRules: {
     '/dashboard/surveys/*/print': { ssr: false },
@@ -10,6 +7,7 @@ export default defineNuxtConfig({
   modules: [
     '@unocss/nuxt',
     '@vueuse/nuxt',
+    '@nuxtjs/html-validator',
   ],
   typescript: {
     strict: true,

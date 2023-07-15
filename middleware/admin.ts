@@ -5,6 +5,6 @@ export default defineNuxtRouteMiddleware(async () => {
   if (error.value?.data?.code === 'UNAUTHORIZED')
     return '/login'
 
-  if (!data.value.admin)
+  if (!data.value?.admin)
     return '/thanks'
 })

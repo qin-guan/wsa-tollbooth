@@ -5,10 +5,15 @@ import Card from 'primevue/card'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
+import ProgressBar from 'primevue/progressbar'
 import { useToast } from 'primevue/usetoast'
 
 definePageMeta({
   middleware: ['participant'],
+})
+
+useSeoMeta({
+  title: 'Thanks',
 })
 
 const route = useRoute()
@@ -17,18 +22,12 @@ const config = useRuntimeConfig()
 const toast = useToast()
 const { $client } = useNuxtApp()
 
-const [
-  { data: responses, pending: responsesPending },
-  { data: survey, pending: surveyPending },
-  { data: me },
-] = [
-  $client.analytics.myResponses.useQuery(undefined, { lazy: true }),
-  $client.survey.get.useQuery({ id: route.query.id as string }, { lazy: true }),
-  $client.me.get.useQuery(undefined, { lazy: true }),
-]
+const { data: responses, pending: responsesPending, error: responsesError } = await $client.response.submitted.useQuery(undefined, { lazy: true })
+const { data: survey, pending: surveyPending } = await $client.survey.get.useQuery({ id: route.query.id as string }, { lazy: true })
+const { data: me } = await $client.me.get.useQuery(undefined, { lazy: true })
 
 const eligibleForLuckyDraw = computed(() => {
-  if (responsesPending)
+  if (responsesPending.value || responsesError.value)
     return false
 
   if (responses.value.length > 1)
@@ -37,6 +36,13 @@ const eligibleForLuckyDraw = computed(() => {
     return true
 
   return false
+})
+
+const progresses = computed(() => {
+  return {
+    booths: responses.value.filter(x => !x.survey.workshop).length / 2 * 100,
+    workshops: responses.value.filter(x => x.survey.workshop).length / 1 * 100,
+  }
 })
 
 const formData = reactive({
@@ -52,7 +58,7 @@ watch(me, (value) => {
     formData.nric = value.nric ?? ''
     formData.phone = value.phone ?? ''
   }
-})
+}, { immediate: true })
 
 async function create() {
   formData.pending = true
@@ -138,12 +144,46 @@ async function create() {
         </template>
       </Card>
 
+      <Card v-else>
+        <template #title>
+          Fill out more forms to participate in the lucky draw!
+        </template>
+        <template #subtitle>
+          Stand a chance to win by going for:
+          <ul list-disc list-inside>
+            <li>
+              1 workshop
+            </li>
+            <li>
+              2 booths
+            </li>
+          </ul>
+        </template>
+        <template #content>
+          <div flex flex-col gap3>
+            <div>
+              <span>Booths</span>
+              <br>
+              <ProgressBar :value="progresses.booths" />
+              <div />
+            </div>
+            <div>
+              <span>Workshops</span>
+              <br>
+              <ProgressBar :value="progresses.workshops" />
+            </div>
+          </div>
+        </template>
+      </Card>
+
       <section>
         <h2 text-2xl font-semibold>
           Your completed surveys
         </h2>
 
         <Skeleton v-if="responsesPending" />
+
+        <DashboardError v-else-if="responsesError" v-bind="responsesError" />
 
         <div v-else-if="responses.length === 0" class="mt3 flex justify-center rounded-lg bg-$surface-card px4 py20">
           <span text-center text-xl>No surveys completed.</span>

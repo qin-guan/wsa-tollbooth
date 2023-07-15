@@ -6,7 +6,6 @@ import { createSSRApp } from 'vue'
 import { verifyToken } from '../../services/auth'
 import { VerificationError } from '../../services/auth.error'
 import { publicProcedure, router } from '../../trpc'
-import type { UserSessionData } from '../../../utils/session'
 import { VerificationCodeEmail } from '../../../emails/VerificationCodeEmail'
 
 const admins = [
@@ -110,11 +109,9 @@ export const emailSessionRouter = router({
         where: { email },
       })
 
-      await ctx.session.update<UserSessionData>({
+      await ctx.session.update({
         id: user.id,
       })
-
-      await ctx.session.seal()
 
       return user
     }),

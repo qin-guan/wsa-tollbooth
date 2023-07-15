@@ -1,20 +1,22 @@
 import type { inferAsyncReturnType } from '@trpc/server'
-import type { H3Event } from 'h3'
-import { createSessionContext } from '../utils/session'
+import type { H3Event, SessionConfig } from 'h3'
 
 /**
  * Creates context for an incoming request
  * @link https://trpc.io/docs/context
  */
-export function createContext(_event: H3Event) {
+export async function createContext(_event: H3Event) {
   // TODO better logging for this
   // logger(_event.node.req, _event.node.res)
 
-  const session = createSessionContext(_event)
+  const config: SessionConfig = {
+    name: useRuntimeConfig().sessionName,
+    password: useRuntimeConfig().sessionSecret,
+  }
 
   return {
     prisma,
-    session,
+    session: await useSession(_event, config),
   }
 }
 

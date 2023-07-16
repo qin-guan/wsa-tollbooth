@@ -17,7 +17,7 @@ useSeoMeta({
 
 const toast = useToast()
 const { $client } = useNuxtApp()
-const { data: surveys, pending: surveysPending, error: surveysError } = await $client.survey.list.useQuery(undefined, { lazy: true })
+const { data: surveys, pending: surveysPending, error: surveysError, refresh: surveyRefresh } = await $client.survey.list.useQuery(undefined, { lazy: true })
 const { data: pastWinners, pending: pastWinnersPending, error: pastWinnersError, refresh: pastWinnersRefresh } = await $client.luckyDraw.pastWinners.useQuery(undefined, { lazy: true })
 
 const visible = ref(false)
@@ -69,6 +69,24 @@ async function deleteWinner(id: string) {
       id,
     })
     await pastWinnersRefresh()
+  }
+  catch (err) {
+    console.error(err)
+    if (err instanceof TRPCClientError) {
+      toast.add({
+        severity: 'error',
+        summary: err.message,
+      })
+    }
+  }
+}
+
+async function deleteSurvey(id: string) {
+  try {
+    await $client.survey.delete.mutate({
+      id,
+    })
+    await surveyRefresh()
   }
   catch (err) {
     console.error(err)
@@ -142,6 +160,7 @@ async function deleteWinner(id: string) {
               <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">
                 <Button label="Edit" size="small" link />
               </NuxtLink>
+              <Button label="Delete" size="small" link @click="deleteSurvey(slotProps.data.id)"/>
             </template>
           </Column>
         </DataTable>

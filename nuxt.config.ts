@@ -44,27 +44,6 @@ export default defineNuxtConfig({
   },
 
   image: {},
-  nitro: {
-    storage: {
-      redis: (() => (process.env.NUXT_ENABLE_REDIS
-        ? {
-            driver: 'redis',
-            port: process.env.NUXT_REDIS_PORT,
-            host: process.env.NUXT_REDIS_HOST,
-            username: process.env.NUXT_REDIS_USERNAME,
-            password: process.env.NUXT_REDIS_PASSWORD,
-          }
-        : {
-            driver: 'memory',
-          }
-      ))(),
-    },
-    devStorage: {
-      redis: {
-        driver: 'memory',
-      },
-    },
-  },
 
   runtimeConfig: {
     public: {
@@ -77,6 +56,14 @@ export default defineNuxtConfig({
 
     sessionSecret: '',
     sessionName: 'h3',
+
+    redis: {
+      enabled: false,
+      host: '',
+      port: 0,
+      username: '',
+      password: '',
+    },
 
     resend: {
       apiKey: '',

@@ -43,7 +43,12 @@ export const responseRouter = router({
         },
       })
       const permissions = survey.permissions as SurveyPermissionSchema
-      if (permissions.find(p => p.email === ctx.session.user.email && p.permission === 'read'))
+      if (
+        permissions
+        && permissions.find(p =>
+          p.email === ctx.session.user.email && p.permission === 'read',
+        )
+      )
         return next()
 
       throw new TRPCError({

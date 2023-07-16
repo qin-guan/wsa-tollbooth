@@ -5,7 +5,9 @@ import type { QuestionsSchema, SurveyPermissionSchema, SurveyResponseSchema } fr
 
 // TODO probably need a better name for all the functions here
 export const analyticsRouter = router({
+  // This has participants: true as users with access to individual survey analytics needs this procedure
   chartResponses: protectedProcedure
+    .meta({ participants: true })
     .input(
       z.object({
         id: z.string(),
@@ -21,7 +23,12 @@ export const analyticsRouter = router({
         },
       })
       const permissions = survey.permissions as SurveyPermissionSchema
-      if (permissions.find(p => p.email === ctx.session.user.email && p.permission === 'read'))
+      if (
+        permissions
+        && permissions.find(p =>
+          p.email === ctx.session.user.email && p.permission === 'read',
+        )
+      )
         return next()
 
       throw new TRPCError({

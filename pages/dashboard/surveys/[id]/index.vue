@@ -49,7 +49,7 @@ async function printQR() {
 }
 
 async function openAnalytics() {
-  await navigateTo(`/dashboard/surveys/${route.params.id}/analytics`)
+  await navigateTo(`/s/${route.params.id}/analytics`)
 }
 
 async function openPreview() {

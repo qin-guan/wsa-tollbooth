@@ -16,8 +16,16 @@ export const surveyRouter = router({
       id: z.string(),
     }),
   ).query(async ({ ctx, input }) => {
-    if (await surveyStorage.hasItem(input.id))
-      return await surveyStorage.getItem<Survey>(input.id)
+    if (await surveyStorage.hasItem(input.id)) {
+      const survey = await surveyStorage.getItem<Survey>(input.id)
+
+      return {
+        ...survey,
+        questions: survey?.questions as QuestionsSchema,
+        // Fallback to [] as it could be null
+        permissions: (survey?.permissions ?? []) as SurveyPermissionSchema,
+      }
+    }
 
     try {
       const survey = await ctx.prisma.survey.findUniqueOrThrow({

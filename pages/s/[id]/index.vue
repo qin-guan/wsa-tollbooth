@@ -2,6 +2,7 @@
 import Button from 'primevue/button'
 import RadioButton from 'primevue/radiobutton'
 import Textarea from 'primevue/textarea'
+import Card from 'primevue/card'
 import { useToast } from 'primevue/usetoast'
 
 import type { SurveyResponseSchema } from '~/shared/survey'
@@ -11,7 +12,6 @@ definePageMeta({
 })
 
 const { $client } = useNuxtApp()
-const config = useRuntimeConfig()
 
 const route = useRoute()
 const toast = useToast()
@@ -24,20 +24,17 @@ useSeoMeta({
 })
 
 const formData = ref<SurveyResponseSchema | null>(null)
-
 const pending = ref(false)
-watch(responses, async (value) => {
-  if (!value)
-    return
-  if (value.find(v => v.surveyId === route.params.id)) {
-    await navigateTo({
-      path: '/thanks',
-      query: {
-        id: route.params.id,
-      },
-    })
-  }
-}, { immediate: true })
+
+const responded = computed(() => {
+  if (!responses.value)
+    return false
+
+  if (responses.value.find(v => v.surveyId === route.params.id))
+    return true
+
+  return false
+})
 
 watch(survey, (value) => {
   if (!value)
@@ -117,7 +114,22 @@ async function submit() {
           <br>
           <hr>
 
-          <form v-if="formData" @submit.prevent="submit">
+          <div v-if="responded" mt-10>
+            <Card>
+              <template #title>
+                You've filled in this survey already!
+              </template>
+              <template #subtitle>
+                You can only fill in a survey once.
+                Do check out our other booths and workshops!
+              </template>
+              <template #content>
+                <Button label="Edit lucky draw information" @click="navigateTo('/thanks')" />
+              </template>
+            </Card>
+          </div>
+
+          <form v-else-if="formData" @submit.prevent="submit">
             <div v-for="(question, idx) in survey.questions" :key="idx" mt-10>
               <h2 text-2xl font-semibold>
                 {{ question.title }}

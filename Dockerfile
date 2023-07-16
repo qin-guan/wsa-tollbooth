@@ -1,4 +1,4 @@
-FROM docker.io/library/node:lts-alpine AS base
+FROM docker.io/library/node:lts AS base
 
 # Prepare work directory
 WORKDIR /wsa-tollbooth

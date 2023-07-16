@@ -32,7 +32,7 @@ ARG GID=911
 # Create a dedicated user and group
 RUN set -eux; \
     addgroup --gid $GID wsa-tollbooth; \
-    adduser --uid $UID -D -G wsa-tollbooth wsa-tollbooth;
+    adduser --uid $UID --defaults --groups wsa-tollbooth wsa-tollbooth;
 
 USER wsa-tollbooth
 

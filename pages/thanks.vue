@@ -7,6 +7,7 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import ProgressBar from 'primevue/progressbar'
 import { useToast } from 'primevue/usetoast'
+import { TRPCClientError } from '@trpc/client'
 
 definePageMeta({
   middleware: ['participant'],
@@ -85,6 +86,14 @@ async function create() {
   }
   catch (err) {
     console.error(err)
+    if (err instanceof TRPCClientError) {
+      if (err.data.code === 'BAD_REQUEST') {
+        toast.add({
+          severity: 'error',
+          summary: 'Please enter a valid NRIC or phone number!',
+        })
+      }
+    }
   }
   finally {
     formData.pending = false

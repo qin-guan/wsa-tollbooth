@@ -5,6 +5,7 @@ import Textarea from 'primevue/textarea'
 import Card from 'primevue/card'
 import { useToast } from 'primevue/usetoast'
 
+import { TRPCClientError } from '@trpc/client'
 import type { SurveyResponseSchema } from '~/shared/survey'
 
 definePageMeta({
@@ -84,6 +85,12 @@ async function submit() {
   }
   catch (err) {
     console.error(err)
+    if (err instanceof TRPCClientError) {
+      toast.add({
+        severity: 'error',
+        summary: err.message,
+      })
+    }
   }
   finally {
     pending.value = false

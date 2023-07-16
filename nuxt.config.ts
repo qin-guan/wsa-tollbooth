@@ -49,7 +49,7 @@ export default defineNuxtConfig({
       devStorage: {
         driver: 'memory',
       },
-      redis: (() => (!process.env.NUXT_ENABLE_REDIS
+      redis: (() => (process.env.NUXT_ENABLE_REDIS
         ? {
             driver: 'redis',
             port: process.env.NUXT_REDIS_PORT,

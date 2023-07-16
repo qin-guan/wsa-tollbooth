@@ -18,6 +18,11 @@ export const surveyRouter = router({
   ).query(async ({ ctx, input }) => {
     if (await surveyStorage.hasItem(input.id)) {
       const survey = await surveyStorage.getItem<Survey>(input.id)
+      if (!survey) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
 
       return {
         ...survey,
@@ -58,7 +63,7 @@ export const surveyRouter = router({
 
   list: protectedProcedure.query(async ({ ctx }) => {
     if (await surveyStorage.hasItem('__all_surveys'))
-      return await surveyStorage.getItem<Survey[]>('__all_surveys')
+      return await surveyStorage.getItem<Survey[]>('__all_surveys') ?? []
 
     const surveys = await ctx.prisma.survey.findMany()
     await surveyStorage.setItem('__all_surveys', surveys)

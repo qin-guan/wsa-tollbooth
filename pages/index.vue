@@ -5,10 +5,6 @@ const { $client } = useNuxtApp()
 const config = useRuntimeConfig()
 
 const { data: me } = await $client.me.get.useQuery(undefined, { lazy: true })
-
-function docs() {
-  window.open('https://start-docs.qinguan.me', '_target')
-}
 </script>
 
 <template>
@@ -29,14 +25,13 @@ function docs() {
       >
         <div>
           <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl">
-            This is probably an okay landing page. Maybe.
+            This is a survey platform for {{ config.public.appName }}
           </h1>
           <p class="mb-6 lg:text-xl md:text-lg">
-            It has a cute dog though. That's gotta count for something, right?
+            If you are a participant, please scan QR codes available at booths to get started.
           </p>
           <div flex="~ gap-2">
             <Button rounded label="Get started" @click="$router.push('/login')" />
-            <Button link rounded label="Documentation" @click="docs" />
           </div>
         </div>
         <div py-20>

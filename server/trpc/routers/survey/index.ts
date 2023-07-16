@@ -42,19 +42,21 @@ export const surveyRouter = router({
     return await ctx.prisma.survey.findMany()
   }),
 
-  create: protectedProcedure.input(
-    z.object({
-      title: z.string(),
-      description: z.string(),
-      workshop: z.boolean(),
-      questions: questionsSchema,
-      permissions: surveyPermissionSchema,
+  create: protectedProcedure
+    .meta({ openapi: { method: 'POST', path: '/surveys' } })
+    .input(
+      z.object({
+        title: z.string(),
+        description: z.string(),
+        workshop: z.boolean(),
+        questions: questionsSchema,
+        permissions: surveyPermissionSchema,
+      }),
+    ).mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.survey.create({
+        data: input,
+      })
     }),
-  ).mutation(async ({ ctx, input }) => {
-    return await ctx.prisma.survey.create({
-      data: input,
-    })
-  }),
 
   update: protectedProcedure.input(
     z.object({

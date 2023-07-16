@@ -9,6 +9,7 @@
  */
 import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
+import type { OpenApiMeta } from 'trpc-nuxt'
 import type { Context } from '~/server/trpc/context'
 
 interface Meta {
@@ -19,6 +20,7 @@ interface Meta {
 const t = initTRPC
   .context<Context>()
   .meta<Meta>()
+  .meta<OpenApiMeta>()
   .create({
     transformer: superjson,
     defaultMeta: {

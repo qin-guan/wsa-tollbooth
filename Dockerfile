@@ -1,4 +1,4 @@
-FROM docker.io/library/node:lts AS base
+FROM docker.io/library/node:lts-alpine AS base
 
 # Prepare work directory
 WORKDIR /wsa-tollbooth
@@ -8,12 +8,14 @@ FROM base AS builder
 # Prepare pnpm https://pnpm.io/installation#using-corepack
 RUN corepack enable
 
+# Prepare deps
+RUN apk update
+RUN apk add git --no-cache
+
 # Prepare build deps ( ignore postinstall scripts for now )
 COPY .npmrc ./
 COPY package.json ./
 COPY pnpm-lock.yaml ./
-
-RUN pnpm i --frozen-lockfile --ignore-scripts
 
 # Copy all source files
 COPY . ./
@@ -31,8 +33,8 @@ ARG GID=911
 
 # Create a dedicated user and group
 RUN set -eux; \
-    addgroup --gid $GID wsa-tollbooth; \
-    adduser --uid $UID --defaults --groups wsa-tollbooth wsa-tollbooth;
+    addgroup -g $GID wsa-tollbooth; \
+    adduser -u $UID -D -G wsa-tollbooth wsa-tollbooth;
 
 USER wsa-tollbooth
 

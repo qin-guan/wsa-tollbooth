@@ -100,7 +100,7 @@ async function submit() {
       <DashboardError v-if="surveyError" v-bind="surveyError" />
       <template v-else-if="survey">
         <div mx-auto max-w-3xl container>
-          <div>
+          <div class="w-[135px]">
             <NuxtImg preload height="135px" width="auto" densities="x1 x2 x3" src="/images/logo.webp" />
           </div>
 

@@ -81,7 +81,7 @@ useSeoMeta({
       <div
         v-else-if="survey"
       >
-        <div mb10>
+        <div class="w-[135px]">
           <NuxtImg preload height="135px" width="auto" densities="x1 x2 x3" src="/images/logo.webp" />
         </div>
 

@@ -85,7 +85,7 @@ useSeoMeta({
           <NuxtImg preload height="135px" width="auto" densities="x1 x2 x3" src="/images/logo.webp" />
         </div>
 
-        <h1 v-if="survey" text-xl font-bold>
+        <h1 v-if="survey" mt8 text-xl font-bold>
           Responses for {{ survey.title }}
         </h1>
       </div>

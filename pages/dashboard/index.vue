@@ -34,7 +34,8 @@ async function create() {
   try {
     const survey = await $client.survey.create.mutate({
       ...createForm,
-      schema: [],
+      questions: [],
+      permissions: [],
     })
     navigateTo(`/dashboard/surveys/${survey.id}`)
   }

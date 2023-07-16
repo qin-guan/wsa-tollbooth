@@ -13,7 +13,7 @@ export const meRouter = router({
       if (await userStorage.hasItem(ctx.session.user.id))
         return await userStorage.getItem<User>(ctx.session.user.id)
 
-      const user = ctx.prisma.user.findUniqueOrThrow({
+      const user = await ctx.prisma.user.findUniqueOrThrow({
         where: { id: ctx.session.user.id },
         select: defaultUserSelect,
       })
@@ -30,7 +30,7 @@ export const meRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const user = ctx.prisma.user.update({
+      const user = await ctx.prisma.user.update({
         where: { id: ctx.session.user.id },
         data: input,
       })

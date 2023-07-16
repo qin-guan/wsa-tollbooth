@@ -109,7 +109,7 @@ async function create() {
       </div>
 
       <section>
-        <Skeleton v-if="surveyPending" />
+        <Skeleton v-if="surveyPending" height="200px" />
         <span v-else flex flex-col>
           <h1 v-if="survey" text-5xl font-bold>
             Thanks for filling up {{ survey.title }}
@@ -123,8 +123,10 @@ async function create() {
         </span>
       </section>
 
+      <Skeleton v-if="responsesPending" height="300px" />
+
       <template
-        v-if="eligibleForLuckyDraw"
+        v-else-if="eligibleForLuckyDraw"
       >
         <Card v-if="formData.showDetails">
           <template #title>

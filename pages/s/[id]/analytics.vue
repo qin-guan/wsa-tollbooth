@@ -82,68 +82,70 @@ useSeoMeta({
         v-else-if="survey"
       >
         <div class="w-[135px]">
-          <NuxtImg preload height="135px" width="auto" densities="x1 x2 x3" src="/images/logo.webp" />
+          <NuxtImg preload width="135px" densities="x1 x2 x3" quality="100" src="/images/logo.webp" />
         </div>
-
-        <h1 v-if="survey" mt8 text-xl font-bold>
-          Responses for {{ survey.title }}
-        </h1>
       </div>
 
-      <Skeleton v-if="surveyPending || responsesPending" height="500px" />
-      <DashboardError v-else-if="responsesError" v-bind="responsesError" />
-      <TabView v-else-if="responses" class="mt-10">
-        <TabPanel header="Data table">
-          <DataTable :value="responses" table-class="w-full">
-            <Column field="id" header="ID" />
-            <Column field="timestamp" header="Timestamp" />
-            <Column header="Respondent">
-              <template #body="bodySlot">
-                <span v-if="bodySlot.data.respondent.name">
-                  {{ bodySlot.data.respondent.name }}
-                </span>
-                <span v-else>
-                  Unregistered
-                </span>
-              </template>
-            </Column>
-            <Column header="Expand">
-              <template #body="bodySlot">
-                <Button icon="" link @click="responsePreview.idx = bodySlot.index; responsePreview.visible = true">
-                  <div i-tabler-arrow-up-right text-xl />
-                </Button>
-              </template>
-            </Column>
-          </DataTable>
-        </TabPanel>
-        <TabPanel header="Charts">
-          <Skeleton v-if="chartPending" height="300px" />
-          <DashboardError v-if="chartError" v-bind="chartError" />
-          <div v-else-if="chart" flex flex-col gap6>
-            <div
-              v-for="(qnChartData, idx) in chart"
-              :key="idx"
-            >
-              <div
-                v-if="qnChartData.labels.length > 0"
-              >
-                <span font-semibold>
-                  {{ survey?.questions[idx].title }}
-                </span>
-                <Chart
-                  type="bar" :data="qnChartData" :options="{
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                      },
-                    },
-                  }"
-                />
-              </div>
-            </div>
-          </div>
-        </TabPanel>
-      </TabView>
+      <h1 v-if="survey" mt8 text-xl font-bold>
+        Responses for {{ survey.title }}
+      </h1>
     </main>
+  </div>
+
+  <Skeleton v-if="surveyPending || responsesPending" height="500px" />
+  <DashboardError v-else-if="responsesError" v-bind="responsesError" />
+  <TabView v-else-if="responses" class="mt-10">
+    <TabPanel header="Data table">
+      <DataTable :value="responses" table-class="w-full">
+        <Column field="id" header="ID" />
+        <Column field="timestamp" header="Timestamp" />
+        <Column header="Respondent">
+          <template #body="bodySlot">
+            <span v-if="bodySlot.data.respondent.name">
+              {{ bodySlot.data.respondent.name }}
+            </span>
+            <span v-else>
+              Unregistered
+            </span>
+          </template>
+        </Column>
+        <Column header="Expand">
+          <template #body="bodySlot">
+            <Button icon="" link @click="responsePreview.idx = bodySlot.index; responsePreview.visible = true">
+              <div i-tabler-arrow-up-right text-xl />
+            </Button>
+          </template>
+        </Column>
+      </DataTable>
+    </TabPanel>
+    <TabPanel header="Charts">
+      <Skeleton v-if="chartPending" height="300px" />
+      <DashboardError v-if="chartError" v-bind="chartError" />
+      <div v-else-if="chart" flex flex-col gap6>
+        <div
+          v-for="(qnChartData, idx) in chart"
+          :key="idx"
+        >
+          <div
+            v-if="qnChartData.labels.length > 0"
+          >
+            <span font-semibold>
+              {{ survey?.questions[idx].title }}
+            </span>
+            <Chart
+              type="bar" :data="qnChartData" :options="{
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }"
+            />
+          </div>
+        </div>
+      </div>
+    </TabPanel>
+  </TabView>
+  </main>
   </div>
 </template>

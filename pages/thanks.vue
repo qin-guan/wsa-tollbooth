@@ -105,7 +105,7 @@ async function create() {
   <div p-6 lg:px-30>
     <main flex flex-col gap10>
       <div class="w-[135px]">
-        <NuxtImg preload width="135px" densities="x1 x2 x3" src="/images/logo.webp" />
+        <NuxtImg preload width="135px" densities="x1 x2 x3" quality="100" src="/images/logo.webp" />
       </div>
 
       <section>

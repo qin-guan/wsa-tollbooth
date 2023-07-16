@@ -126,4 +126,16 @@ export const surveyRouter = router({
 
     return survey
   }),
+
+  delete: protectedProcedure.input(
+    z.object({
+      id: z.string(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    await ctx.prisma.survey.delete({
+      where: { id: input.id },
+    })
+
+    await surveyStorage.removeItem(input.id)
+  }),
 })

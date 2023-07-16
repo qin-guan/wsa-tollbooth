@@ -12,12 +12,11 @@ internal_port = 3000
 processes = ["app"]
 protocol = "tcp"
 [services.concurrency]
-hard_limit = 1000
-soft_limit = 1000
+hard_limit = 10000
+soft_limit = 10000
 type = "connections"
 
 [[services.ports]]
-force_https = true
 handlers = ["http"]
 port = 80
 

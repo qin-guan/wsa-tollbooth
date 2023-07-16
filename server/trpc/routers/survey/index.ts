@@ -17,7 +17,7 @@ export const surveyRouter = router({
     }),
   ).query(async ({ ctx, input }) => {
     if (await surveyStorage.hasItem(input.id))
-      return await surveyStorage.getItem<Survey>(ctx.session.user.id)
+      return await surveyStorage.getItem<Survey>(input.id)
 
     try {
       const survey = await ctx.prisma.survey.findUniqueOrThrow({

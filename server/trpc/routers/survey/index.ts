@@ -2,12 +2,12 @@ import type { Survey } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { createStorage, prefixStorage } from 'unstorage'
+import { prefixStorage } from 'unstorage'
 import type { QuestionsSchema, SurveyPermissionSchema } from '../../../../shared/survey'
 import { questionsSchema, surveyPermissionSchema } from '../../../../shared/survey'
 import { protectedProcedure, router } from '../../trpc'
 
-const baseStorage = createStorage()
+const baseStorage = useStorage('redis')
 const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
 export const surveyRouter = router({

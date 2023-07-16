@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { createStorage, prefixStorage } from 'unstorage'
+import { prefixStorage } from 'unstorage'
 import type { User } from '@prisma/client'
 import { protectedProcedure, router } from '../../trpc'
 
-const baseStorage = createStorage()
+const baseStorage = useStorage('redis')
 const userStorage = prefixStorage(baseStorage, 'users')
 
 export const meRouter = router({

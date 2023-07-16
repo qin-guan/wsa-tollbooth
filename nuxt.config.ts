@@ -46,9 +46,6 @@ export default defineNuxtConfig({
   image: {},
   nitro: {
     storage: {
-      devStorage: {
-        driver: 'memory',
-      },
       redis: (() => (process.env.NUXT_ENABLE_REDIS
         ? {
             driver: 'redis',
@@ -61,6 +58,11 @@ export default defineNuxtConfig({
             driver: 'memory',
           }
       ))(),
+    },
+    devStorage: {
+      redis: {
+        driver: 'memory',
+      },
     },
   },
 

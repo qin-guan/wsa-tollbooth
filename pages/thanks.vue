@@ -90,7 +90,7 @@ async function create() {
       if (err.data.code === 'BAD_REQUEST') {
         toast.add({
           severity: 'error',
-          summary: 'Please enter a valid NRIC or phone number!',
+          summary: 'Please enter a valid NRIC and phone number!',
         })
       }
     }

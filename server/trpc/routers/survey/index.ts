@@ -55,6 +55,7 @@ export const surveyRouter = router({
     )
     .output(
       z.object({
+        id: z.string(),
         title: z.string(),
         description: z.string(),
         workshop: z.boolean(),

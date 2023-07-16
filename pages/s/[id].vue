@@ -42,7 +42,7 @@ watch(responses, async (value) => {
 watch(survey, (value) => {
   if (!value)
     return
-  const initFormData: SurveyResponseSchema = value.schema.map((question) => {
+  const initFormData: SurveyResponseSchema = value.questions.map((question) => {
     if (question.type === 'mcq') {
       return {
         type: 'mcq',
@@ -118,7 +118,7 @@ async function submit() {
           <hr>
 
           <form v-if="formData" @submit.prevent="submit">
-            <div v-for="(question, idx) in survey.schema" :key="idx" mt-10>
+            <div v-for="(question, idx) in survey.questions" :key="idx" mt-10>
               <h2 text-2xl font-semibold>
                 {{ question.title }}
               </h2>

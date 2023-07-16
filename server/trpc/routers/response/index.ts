@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import { protectedProcedure, router } from '../../trpc'
+import type { SurveyPermissionSchema } from '~/shared/survey'
 import { surveyResponseSchema } from '~/shared/survey'
 
 const surveyProtectedProcedure = protectedProcedure.input(
@@ -28,18 +30,38 @@ export const responseRouter = router({
       return data.surveyResponses
     }),
 
-  list: surveyProtectedProcedure.query(async ({ ctx, input }) => {
-    const data = await ctx.prisma.response.findMany({
-      where: {
-        surveyId: input.surveyId,
-      },
-      include: {
-        respondent: true,
-      },
-    })
+  // This has participants: true as users with access to individual survey analytics needs this procedure
+  list: surveyProtectedProcedure
+    .meta({ participants: true })
+    .use(async ({ ctx, input, next }) => {
+      if (ctx.session.user.admin)
+        return next()
 
-    return data
-  }),
+      const survey = await ctx.prisma.survey.findUniqueOrThrow({
+        where: {
+          id: input.surveyId,
+        },
+      })
+      const permissions = survey.permissions as SurveyPermissionSchema
+      if (permissions.find(p => p.email === ctx.session.user.email && p.permission === 'read'))
+        return next()
+
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+      })
+    })
+    .query(async ({ ctx, input }) => {
+      const data = await ctx.prisma.response.findMany({
+        where: {
+          surveyId: input.surveyId,
+        },
+        include: {
+          respondent: true,
+        },
+      })
+
+      return data
+    }),
 
   create: surveyProtectedProcedure.meta({ participants: true }).input(
     z.object({

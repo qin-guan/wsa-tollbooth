@@ -7,7 +7,7 @@ const questionSchema = z.object({
   options: z.array(z.string()),
 })
 
-export const surveySchema = z.array(questionSchema)
+export const questionsSchema = z.array(questionSchema)
 
 const textQuestionResponseSchema = z.object({
   type: z.literal('text'),
@@ -28,4 +28,11 @@ export const surveyResponseSchema = z.array(questionResponseSchema)
 
 export type QuestionResponseSchema = z.infer<typeof questionResponseSchema>
 export type SurveyResponseSchema = z.infer<typeof surveyResponseSchema>
-export type SurveySchema = z.infer<typeof surveySchema>
+export type QuestionsSchema = z.infer<typeof questionsSchema>
+
+export const surveyPermissionSchema = z.array(z.object({
+  email: z.string(),
+  permission: z.enum(['read']),
+}))
+
+export type SurveyPermissionSchema = z.infer<typeof surveyPermissionSchema>

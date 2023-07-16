@@ -28,7 +28,7 @@ model User {
   phone String?
 
   admin Boolean
-  won Boolean?
+  won   Boolean?
 
   surveyResponses Response[]
 }
@@ -38,7 +38,8 @@ model Survey {
   title       String
   description String
   workshop    Boolean
-  schema      Json
+  questions   Json
+  permissions Json?
 
   responses Response[]
 }

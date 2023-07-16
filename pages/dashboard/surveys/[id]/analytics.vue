@@ -34,7 +34,7 @@ useSeoMeta({
       <Skeleton v-if="surveyPending" height="100px" />
       <DashboardError v-else-if="surveyError" v-bind="surveyError" />
       <div v-else-if="survey" flex flex-col divide-y divide-gray>
-        <div v-for="(question, idx) in survey.schema" :key="idx" flex flex-col gap3 py6>
+        <div v-for="(question, idx) in survey.questions" :key="idx" flex flex-col gap3 py6>
           <span font-semibold>{{ question.title }}</span>
 
           <div
@@ -97,7 +97,7 @@ useSeoMeta({
 
     <Skeleton v-if="surveyPending || responsesPending" height="500px" />
     <DashboardError v-else-if="responsesError" v-bind="responsesError" />
-    <TabView v-else-if="responses">
+    <TabView v-else-if="responses" class="mt-3">
       <TabPanel header="Data table">
         <DataTable :value="responses" table-class="w-full">
           <Column field="id" header="ID" />
@@ -133,7 +133,7 @@ useSeoMeta({
               v-if="qnChartData.labels.length > 0"
             >
               <span font-semibold>
-                {{ survey?.schema[idx].title }}
+                {{ survey?.questions[idx].title }}
               </span>
               <Chart
                 type="bar" :data="qnChartData" :options="{

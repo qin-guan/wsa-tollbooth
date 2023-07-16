@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import type { SurveySchema } from '../../../../shared/survey'
-import { surveySchema } from '../../../../shared/survey'
+import type { QuestionsSchema, SurveyPermissionSchema } from '../../../../shared/survey'
+import { questionsSchema, surveyPermissionSchema } from '../../../../shared/survey'
 import { protectedProcedure, router } from '../../trpc'
 
 export const surveyRouter = router({
@@ -20,7 +20,9 @@ export const surveyRouter = router({
 
       return {
         ...survey,
-        schema: survey.schema as SurveySchema,
+        questions: survey.questions as QuestionsSchema,
+        // Fallback to [] as it could be null
+        permissions: (survey.permissions ?? []) as SurveyPermissionSchema,
       }
     }
     catch (err) {
@@ -45,7 +47,8 @@ export const surveyRouter = router({
       title: z.string(),
       description: z.string(),
       workshop: z.boolean(),
-      schema: surveySchema,
+      questions: questionsSchema,
+      permissions: surveyPermissionSchema,
     }),
   ).mutation(async ({ ctx, input }) => {
     return await ctx.prisma.survey.create({
@@ -59,7 +62,8 @@ export const surveyRouter = router({
       title: z.string(),
       description: z.string(),
       workshop: z.boolean(),
-      schema: surveySchema,
+      questions: questionsSchema,
+      permissions: surveyPermissionSchema,
     }),
   ).mutation(async ({ ctx, input }) => {
     return await ctx.prisma.survey.update({

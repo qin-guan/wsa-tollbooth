@@ -52,10 +52,27 @@ export const surveyRouter = router({
         questions: questionsSchema,
         permissions: surveyPermissionSchema,
       }),
-    ).mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.survey.create({
+    )
+    .output(
+      z.object({
+        title: z.string(),
+        description: z.string(),
+        workshop: z.boolean(),
+        questions: questionsSchema,
+        permissions: surveyPermissionSchema,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const survey = await ctx.prisma.survey.create({
         data: input,
       })
+
+      return {
+        ...survey,
+        questions: survey.questions as QuestionsSchema,
+        // Fallback to [] as it could be null
+        permissions: (survey.permissions ?? []) as SurveyPermissionSchema,
+      }
     }),
 
   update: protectedProcedure.input(

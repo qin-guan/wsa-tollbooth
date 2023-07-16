@@ -9,7 +9,7 @@
  */
 import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
-import type { OpenApiMeta } from 'trpc-nuxt'
+import type { OpenApiMeta } from 'trpc-openapi'
 import type { Context } from '~/server/trpc/context'
 
 interface Meta {

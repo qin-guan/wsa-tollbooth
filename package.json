@@ -48,6 +48,7 @@
     "qrcode": "^1.5.3",
     "resend": "^0.17.1",
     "sass": "^1.63.6",
+    "sharp": "^0.32.3",
     "simple-git-hooks": "^2.8.1",
     "std-env": "^3.3.3",
     "superjson": "^1.12.4",

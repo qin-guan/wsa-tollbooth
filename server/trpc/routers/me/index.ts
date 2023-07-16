@@ -11,7 +11,7 @@ export const meRouter = router({
     .meta({ participants: true })
     .query(async ({ ctx }) => {
       if (await userStorage.hasItem(ctx.session.user.id)) {
-        console.log('cached')
+        console.log('cached', baseStorage.getMounts())
         return await userStorage.getItem<User>(ctx.session.user.id)
       }
 

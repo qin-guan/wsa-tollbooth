@@ -10,8 +10,10 @@ export const meRouter = router({
   get: protectedProcedure
     .meta({ participants: true })
     .query(async ({ ctx }) => {
-      if (await userStorage.hasItem(ctx.session.user.id))
+      if (await userStorage.hasItem(ctx.session.user.id)) {
+        console.log('cached from redis')
         return await userStorage.getItem<User>(ctx.session.user.id)
+      }
 
       const user = await ctx.prisma.user.findUniqueOrThrow({
         where: { id: ctx.session.user.id },

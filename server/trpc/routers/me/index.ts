@@ -1,14 +1,25 @@
 import { z } from 'zod'
+import { createStorage, prefixStorage } from 'unstorage'
+import type { User } from '@prisma/client'
 import { protectedProcedure, router } from '../../trpc'
+
+const baseStorage = createStorage()
+const userStorage = prefixStorage(baseStorage, 'users')
 
 export const meRouter = router({
   get: protectedProcedure
     .meta({ participants: true })
     .query(async ({ ctx }) => {
-      return ctx.prisma.user.findUniqueOrThrow({
+      if (await userStorage.hasItem(ctx.session.user.id))
+        return await userStorage.getItem<User>(ctx.session.user.id)
+
+      const user = ctx.prisma.user.findUniqueOrThrow({
         where: { id: ctx.session.user.id },
         select: defaultUserSelect,
       })
+
+      await userStorage.setItem(ctx.session.user.id, user)
+      return user
     }),
   update: protectedProcedure
     .meta({ participants: true }).input(
@@ -19,9 +30,11 @@ export const meRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.user.update({
+      const user = ctx.prisma.user.update({
         where: { id: ctx.session.user.id },
         data: input,
       })
+      await userStorage.setItem(ctx.session.user.id, user)
+      return user
     }),
 })

@@ -1,9 +1,14 @@
+import type { Survey } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { createStorage, prefixStorage } from 'unstorage'
 import type { QuestionsSchema, SurveyPermissionSchema } from '../../../../shared/survey'
 import { questionsSchema, surveyPermissionSchema } from '../../../../shared/survey'
 import { protectedProcedure, router } from '../../trpc'
+
+const baseStorage = createStorage()
+const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
 export const surveyRouter = router({
   get: protectedProcedure.meta({ participants: true }).input(
@@ -11,12 +16,17 @@ export const surveyRouter = router({
       id: z.string(),
     }),
   ).query(async ({ ctx, input }) => {
+    if (await surveyStorage.hasItem(input.id))
+      return await surveyStorage.getItem<Survey>(ctx.session.user.id)
+
     try {
       const survey = await ctx.prisma.survey.findUniqueOrThrow({
         where: {
           id: input.id,
         },
       })
+
+      await surveyStorage.setItem(input.id, survey)
 
       return {
         ...survey,
@@ -39,7 +49,13 @@ export const surveyRouter = router({
   }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.survey.findMany()
+    if (await surveyStorage.hasItem('__all_surveys'))
+      return await surveyStorage.getItem<Survey[]>('__all_surveys')
+
+    const surveys = await ctx.prisma.survey.findMany()
+    await surveyStorage.setItem('__all_surveys', surveys)
+
+    return surveys
   }),
 
   create: protectedProcedure
@@ -68,6 +84,8 @@ export const surveyRouter = router({
         data: input,
       })
 
+      await surveyStorage.setItem(survey.id, survey)
+
       return {
         ...survey,
         questions: survey.questions as QuestionsSchema,
@@ -86,9 +104,13 @@ export const surveyRouter = router({
       permissions: surveyPermissionSchema,
     }),
   ).mutation(async ({ ctx, input }) => {
-    return await ctx.prisma.survey.update({
+    const survey = await ctx.prisma.survey.update({
       where: { id: input.id },
       data: input,
     })
+
+    await surveyStorage.setItem(survey.id, survey)
+
+    return survey
   }),
 })

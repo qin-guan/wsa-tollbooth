@@ -17,7 +17,6 @@ useSeoMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
 
 const toast = useToast()
 const { $client } = useNuxtApp()
@@ -25,6 +24,14 @@ const { $client } = useNuxtApp()
 const { data: responses, pending: responsesPending, error: responsesError } = await $client.response.submitted.useQuery(undefined, { lazy: true })
 const { data: survey, pending: surveyPending } = await $client.survey.get.useQuery({ id: route.query.id as string }, { lazy: true })
 const { data: me } = await $client.me.get.useQuery(undefined, { lazy: true })
+
+const formData = reactive({
+  name: '',
+  nric: '',
+  phone: '',
+  pending: false,
+  showDetails: true,
+})
 
 const eligibleForLuckyDraw = computed(() => {
   if (responsesPending.value || responsesError.value)
@@ -51,18 +58,14 @@ const progresses = computed(() => {
   }
 })
 
-const formData = reactive({
-  name: '',
-  nric: '',
-  phone: '',
-  pending: false,
-})
-
 watch(me, (value) => {
   if (value) {
     formData.name = value.name ?? ''
     formData.nric = value.nric ?? ''
     formData.phone = value.phone ?? ''
+
+    if (value.name && value.nric && value.phone)
+      formData.showDetails = false
   }
 }, { immediate: true })
 
@@ -78,6 +81,7 @@ async function create() {
       summary: 'Profile updated!',
       detail: 'Successfully registered for lucky draw!',
     })
+    formData.showDetails = false
   }
   catch (err) {
     console.error(err)
@@ -110,42 +114,54 @@ async function create() {
         </span>
       </section>
 
-      <Card
+      <template
         v-if="eligibleForLuckyDraw"
       >
-        <template #title>
-          🎉 You're eligible for lucky draw
-        </template>
-        <template #subtitle>
-          Stand a chance to win by updating your personal information below.
-        </template>
-        <template #content>
-          <form flex="~ col gap6" @submit.prevent="create">
-            <div class="flex flex-col gap-2">
-              <label for="name">Name</label>
-              <InputText id="name" v-model="formData.name" placeholder="John Smith" required type="text" aria-describedby="name-help" class="max-w-md" />
-              <small id="name-help" class="sr-only">Enter your name</small>
-            </div>
+        <Card v-if="formData.showDetails">
+          <template #title>
+            🎉 You're eligible for lucky draw
+          </template>
+          <template #subtitle>
+            Stand a chance to win by updating your personal information below.
+          </template>
+          <template #content>
+            <form flex="~ col gap6" @submit.prevent="create">
+              <div class="flex flex-col gap-2">
+                <label for="name">Name</label>
+                <InputText id="name" v-model="formData.name" placeholder="John Smith" required type="text" aria-describedby="name-help" class="max-w-md" />
+                <small id="name-help" class="sr-only">Enter your name</small>
+              </div>
 
-            <div class="flex flex-col gap-2">
-              <label for="nric">NRIC (last 4 characters)</label>
-              <InputMask id="nric" v-model="formData.nric" mask="999a" placeholder="123B" required type="text" aria-describedby="nric-help" class="max-w-md" />
-              <small id="nric-help" class="sr-only">Enter the last 4 characters of your NRIC</small>
-            </div>
+              <div class="flex flex-col gap-2">
+                <label for="nric">NRIC (last 4 characters)</label>
+                <InputMask id="nric" v-model="formData.nric" mask="999a" placeholder="123B" required type="text" aria-describedby="nric-help" class="max-w-md" />
+                <small id="nric-help" class="sr-only">Enter the last 4 characters of your NRIC</small>
+              </div>
 
-            <div class="flex flex-col gap-2">
-              <label for="phone">Phone number</label>
-              <InputMask id="phone" v-model="formData.phone" date="phone" mask="9999 9999" placeholder="8888 8888" required aria-describedby="phone-help" class="max-w-md" />
-              <small id="phone-help" class="sr-only">Enter the last 4 characters of your NRIC</small>
-            </div>
+              <div class="flex flex-col gap-2">
+                <label for="phone">Phone number</label>
+                <InputMask id="phone" v-model="formData.phone" date="phone" mask="9999 9999" placeholder="8888 8888" required aria-describedby="phone-help" class="max-w-md" />
+                <small id="phone-help" class="sr-only">Enter the last 4 characters of your NRIC</small>
+              </div>
 
-            <div>
-              <Button label="Update" type="submit" size="small" :loading="formData.pending" />
-            </div>
-          </form>
-        </template>
-      </Card>
-
+              <div>
+                <Button label="Submit!" type="submit" size="small" :loading="formData.pending" />
+              </div>
+            </form>
+          </template>
+        </Card>
+        <Card v-else>
+          <template #title>
+            🎉 You're all set!
+          </template>
+          <template #subtitle>
+            You're in the lucky draw! Remember to make sure your details are correct!
+          </template>
+          <template #content>
+            <Button label="Update my details" type="button" size="small" @click="formData.showDetails = true" />
+          </template>
+        </Card>
+      </template>
       <Card v-else>
         <template #title>
           Fill out more forms to participate in the lucky draw!

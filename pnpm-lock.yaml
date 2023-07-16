@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 devDependencies:
   '@antfu/eslint-config':
     specifier: ^0.39.7
@@ -112,6 +116,9 @@ devDependencies:
   trpc-openapi:
     specifier: ^1.2.0
     version: 1.2.0(@trpc/server@10.34.0)(zod@3.21.4)
+  unstorage:
+    specifier: ^1.8.0
+    version: 1.8.0
   vitepress:
     specifier: 1.0.0-beta.5
     version: 1.0.0-beta.5(@algolia/client-search@4.18.0)(@types/node@20.4.2)(qrcode@1.5.3)(react@18.2.0)(sass@1.63.6)(search-insights@2.6.0)
@@ -11325,7 +11332,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

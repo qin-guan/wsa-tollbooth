@@ -53,6 +53,7 @@
     "superjson": "^1.12.4",
     "trpc-nuxt": "^0.10.6",
     "trpc-openapi": "^1.2.0",
+    "unstorage": "^1.8.0",
     "vitepress": "1.0.0-beta.5",
     "vue": "^3.3.4",
     "vue-tsc": "^1.8.4",

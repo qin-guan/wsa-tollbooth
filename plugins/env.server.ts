@@ -23,6 +23,13 @@ const resendSchema = z.object({
   }),
 })
 
+const axiomSchema = z.object({
+  axiom: z.object({
+    dataset: z.string(),
+    token: z.string(),
+  }),
+})
+
 const redisSchema = z.object({
   redis: z.object({
     enabled: z.boolean(),
@@ -47,6 +54,7 @@ const server = z
   })
   // Add on schemas as needed that requires conditional validation.
   .merge(resendSchema)
+  .merge(axiomSchema)
   .merge(redisSchema)
   .merge(client)
   .refine(val => !(val.resend.apiKey && !val.resend.fromAddress), {

@@ -11,7 +11,13 @@ const pinoOptions = isDevelopment
         },
       },
     }
-  : {}
+  : {
+      target: '@axiomhq/pino',
+      options: {
+        dataset: useRuntimeConfig().axiom.dataset,
+        token: useRuntimeConfig().axiom.token,
+      },
+    }
 
 const globalForPino = globalThis as unknown as { pino: HttpLogger }
 

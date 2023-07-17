@@ -57,6 +57,11 @@ export default defineNuxtConfig({
     sessionSecret: '',
     sessionName: 'h3',
 
+    axiom: {
+      dataset: '',
+      token: '',
+    },
+
     redis: {
       enabled: false,
       host: '',

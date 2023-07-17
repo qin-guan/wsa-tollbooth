@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.39.7",
+    "@axiomhq/pino": "^0.1.2",
     "@iconify-json/tabler": "^1.1.81",
     "@nuxt/devtools": "latest",
     "@nuxt/image": "1.0.0-rc.1",

@@ -8,6 +8,9 @@ devDependencies:
   '@antfu/eslint-config':
     specifier: ^0.39.7
     version: 0.39.7(eslint@8.44.0)(typescript@5.1.6)
+  '@axiomhq/pino':
+    specifier: ^0.1.2
+    version: 0.1.2
   '@iconify-json/tabler':
     specifier: ^1.1.81
     version: 1.1.81
@@ -389,6 +392,27 @@ packages:
 
   /@antfu/utils@0.7.5:
     resolution: {integrity: sha512-dlR6LdS+0SzOAPx/TPRhnoi7hE251OVeT2Snw0RguNbBSbjUHdWr0l3vcUUDg26rEysT89kCbtw1lVorBXLLCg==}
+    dev: true
+
+  /@axiomhq/js@0.1.2:
+    resolution: {integrity: sha512-gupeqSFnQM9VLtBa8AH2Gt01mupKwUP9YUy7HAgITmyYY5J+o7ek3elITbre8etUpJP/kyOLhs2+D23G07xt6g==}
+    engines: {node: '>=16'}
+    dependencies:
+      cross-fetch: 3.1.8
+      fetch-retry: 5.0.6
+      uuid: 8.3.2
+    transitivePeerDependencies:
+      - encoding
+    dev: true
+
+  /@axiomhq/pino@0.1.2:
+    resolution: {integrity: sha512-P1SDi5mzLgarq2uw61ZhxG5J6QKVvCkhgQUX2E8dkQAeQkvI90fAYfh5n0WVk4/QALKNR+ce1WFFoEZ9t0vQqA==}
+    engines: {node: '>=16'}
+    dependencies:
+      '@axiomhq/js': 0.1.2
+      pino-abstract-transport: 1.0.0
+    transitivePeerDependencies:
+      - encoding
     dev: true
 
   /@babel/code-frame@7.22.5:
@@ -3957,6 +3981,14 @@ packages:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
 
+  /cross-fetch@3.1.8:
+    resolution: {integrity: sha512-cvA+JwZoU0Xq+h6WkMvAUqPEYy92Obet6UdKLfW60qn99ftItKjB5T+BkyWOFWe2pUyfQ+IJHmpOTznqk1M6Kg==}
+    dependencies:
+      node-fetch: 2.6.12
+    transitivePeerDependencies:
+      - encoding
+    dev: true
+
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -5192,6 +5224,10 @@ packages:
     dependencies:
       node-domexception: 1.0.0
       web-streams-polyfill: 3.2.1
+    dev: true
+
+  /fetch-retry@5.0.6:
+    resolution: {integrity: sha512-3yurQZ2hD9VISAhJJP9bpYFNQrHHBXE2JxxjY5aLEcDi46RmAzJE2OC9FAde0yis5ElW0jTTzs0zfg/Cca4XqQ==}
     dev: true
 
   /file-entry-cache@6.0.1:
@@ -10540,6 +10576,11 @@ packages:
       is-generator-function: 1.0.10
       is-typed-array: 1.1.10
       which-typed-array: 1.1.9
+    dev: true
+
+  /uuid@8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
     dev: true
 
   /uvu@0.5.6:

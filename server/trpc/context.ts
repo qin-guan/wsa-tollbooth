@@ -7,7 +7,7 @@ import type { H3Event, SessionConfig } from 'h3'
  */
 export async function createContext(_event: H3Event) {
   // TODO better logging for this
-  // logger(_event.node.req, _event.node.res)
+  logger(_event.node.req, _event.node.res)
 
   const config: SessionConfig = {
     name: useRuntimeConfig().sessionName,

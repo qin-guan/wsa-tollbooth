@@ -58,6 +58,11 @@ export const emailSessionRouter = router({
       })
       return email
     }),
+  logout: publicProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.session.clear()
+      return true
+    }),
   verifyOtp: publicProcedure
     .input(
       z.object({

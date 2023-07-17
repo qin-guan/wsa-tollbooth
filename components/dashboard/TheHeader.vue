@@ -6,14 +6,21 @@ const props = defineProps<{
   name: string | null
 }>()
 const config = useRuntimeConfig()
+const { $client } = useNuxtApp()
 
 const menuVisible = ref(false)
 const menu = ref()
 const items = ref([
   {
     label: 'Logout',
+    command: logout,
   },
 ])
+
+async function logout() {
+  await $client.auth.email.logout.mutate()
+  navigateTo('/login')
+}
 
 function toggle(event: any) {
   menu.value.toggle(event)

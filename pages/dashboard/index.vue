@@ -158,7 +158,7 @@ async function deleteSurvey(event: any, id: string) {
         </div>
 
         <DataTable v-else :value="surveys" table-style="width: 100%;">
-          <Column field="id" header="ID" :sortable="true" style="width: 20%;" />
+          <Column field="id" header="ID" style="width: 20%;" />
           <Column field="title" header="Title" :sortable="true" style="width: 50%" />
           <Column field="workshop" header="Type" :sortable="true" style="width: 20%">
             <template #body="slotProps">
@@ -199,7 +199,7 @@ async function deleteSurvey(event: any, id: string) {
         </h3>
 
         <DataTable v-if="pastWinners" :value="pastWinners">
-          <Column field="id" header="ID" :sortable="true" style="width: 30%" />
+          <Column field="id" header="ID" style="width: 30%" />
           <Column field="name" header="Name" :sortable="true" style="width: 20%" />
           <Column field="nric" header="NRIC" :sortable="true" style="width: 20%" />
           <Column field="phone" header="Phone" :sortable="true" style="width: 20%" />

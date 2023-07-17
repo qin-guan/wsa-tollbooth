@@ -1,11 +1,8 @@
 import type { SessionConfig } from 'h3'
-import { prefixStorage } from 'unstorage'
-
-const baseStorage = useStorage('redis')
-const userStorage = prefixStorage(baseStorage, 'users')
-const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
 export default defineEventHandler(async (event) => {
+  const baseStorage = useStorage('redis')
+
   const config: SessionConfig = {
     name: useRuntimeConfig().sessionName,
     password: useRuntimeConfig().sessionSecret,
@@ -18,10 +15,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await Promise.all([
-    userStorage.clear(),
-    surveyStorage.clear(),
-  ])
+  await baseStorage.clear()
 
   return { ok: true }
 })

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await useSession(event, config)
   if (!session.data.id) {
-    return createError({
+    throw createError({
       status: 403,
     })
   }

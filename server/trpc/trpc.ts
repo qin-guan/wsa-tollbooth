@@ -7,6 +7,7 @@
  * @see https://trpc.io/docs/v10/router
  * @see https://trpc.io/docs/v10/procedures
  */
+import type { User } from '@prisma/client'
 import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import type { OpenApiMeta } from 'trpc-openapi'
@@ -28,9 +29,7 @@ const t = initTRPC
     },
   })
 
-const authMiddleware = t.middleware(async (opts) => {
-  const { next, ctx, meta } = opts
-
+const authMiddleware = t.middleware(async ({ next, ctx, meta }) => {
   let user
   if (!ctx.session.data.id) {
     if (!meta?.participants)
@@ -42,14 +41,22 @@ const authMiddleware = t.middleware(async (opts) => {
       },
     })
 
+    await ctx.cache.users.setItem(user.id, user)
+
     await ctx.session.update({
       id: user.id,
     })
   }
   else {
-    user = await ctx.prisma.user.findUnique({
-      where: { id: ctx.session.data.id },
-    })
+    if (await ctx.cache.users.hasItem(ctx.session.data.id)) {
+      user = await ctx.cache.users.getItem<User>(ctx.session.data.id)
+    }
+    else {
+      user = await ctx.prisma.user.findUnique({
+        where: { id: ctx.session.data.id },
+      })
+    }
+
     if (user === null)
       throw new TRPCError({ code: 'UNAUTHORIZED' })
 

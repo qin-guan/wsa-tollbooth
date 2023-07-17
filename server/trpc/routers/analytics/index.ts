@@ -1,12 +1,8 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { prefixStorage } from 'unstorage'
 import type { Survey } from '@prisma/client'
 import { protectedProcedure, router } from '../../trpc'
 import type { QuestionsSchema, SurveyPermissionSchema, SurveyResponseSchema } from '../../../../shared/survey'
-
-const baseStorage = useStorage('redis')
-const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
 // TODO probably need a better name for all the functions here
 export const analyticsRouter = router({
@@ -23,8 +19,8 @@ export const analyticsRouter = router({
         return next()
 
       let survey
-      if (await surveyStorage.hasItem(input.id)) {
-        survey = await surveyStorage.getItem<Survey>(input.id)
+      if (await ctx.cache.surveys.hasItem(input.id)) {
+        survey = await ctx.cache.surveys.getItem<Survey>(input.id)
         if (!survey) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
@@ -54,8 +50,8 @@ export const analyticsRouter = router({
     })
     .query(async ({ ctx, input }) => {
       let survey
-      if (await surveyStorage.hasItem(input.id)) {
-        survey = await surveyStorage.getItem<Survey>(input.id)
+      if (await ctx.cache.surveys.hasItem(input.id)) {
+        survey = await ctx.cache.surveys.getItem<Survey>(input.id)
         if (!survey) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',

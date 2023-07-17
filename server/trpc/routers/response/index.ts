@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import type { Survey } from '@prisma/client'
 import { protectedProcedure, router } from '../../trpc'
 import type { SurveyPermissionSchema } from '~/shared/survey'
 import { surveyResponseSchema } from '~/shared/survey'
@@ -37,11 +38,23 @@ export const responseRouter = router({
       if (ctx.session.user.admin)
         return next()
 
-      const survey = await ctx.prisma.survey.findUniqueOrThrow({
-        where: {
-          id: input.surveyId,
-        },
-      })
+      let survey
+      if (await ctx.cache.surveys.hasItem(input.surveyId)) {
+        survey = await ctx.cache.surveys.getItem<Survey>(input.surveyId)
+        if (!survey) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+          })
+        }
+      }
+      else {
+        survey = await ctx.prisma.survey.findUniqueOrThrow({
+          where: {
+            id: input.surveyId,
+          },
+        })
+      }
+
       const permissions = survey.permissions as SurveyPermissionSchema
       if (
         permissions

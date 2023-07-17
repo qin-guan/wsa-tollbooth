@@ -2,14 +2,11 @@ import type { Survey } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { prefixStorage } from 'unstorage'
 import type { QuestionsSchema, SurveyPermissionSchema } from '../../../../shared/survey'
 import { questionsSchema, surveyPermissionSchema } from '../../../../shared/survey'
 import { protectedProcedure, router } from '../../trpc'
 
 const ALL_SURVEYS_KEY = '__all_surveys'
-const baseStorage = useStorage('redis')
-const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
 export const surveyRouter = router({
   get: protectedProcedure.meta({ participants: true }).input(
@@ -17,8 +14,8 @@ export const surveyRouter = router({
       id: z.string(),
     }),
   ).query(async ({ ctx, input }) => {
-    if (await surveyStorage.hasItem(input.id)) {
-      const survey = await surveyStorage.getItem<Survey>(input.id)
+    if (await ctx.cache.surveys.hasItem(input.id)) {
+      const survey = await ctx.cache.surveys.getItem<Survey>(input.id)
       if (!survey) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
@@ -40,7 +37,7 @@ export const surveyRouter = router({
         },
       })
 
-      await surveyStorage.setItem(input.id, survey)
+      await ctx.cache.surveys.setItem(input.id, survey)
 
       return {
         ...survey,
@@ -63,11 +60,11 @@ export const surveyRouter = router({
   }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
-    if (await surveyStorage.hasItem(ALL_SURVEYS_KEY))
-      return await surveyStorage.getItem<Survey[]>(ALL_SURVEYS_KEY) ?? []
+    if (await ctx.cache.surveys.hasItem(ALL_SURVEYS_KEY))
+      return await ctx.cache.surveys.getItem<Survey[]>(ALL_SURVEYS_KEY) ?? []
 
     const surveys = await ctx.prisma.survey.findMany()
-    await surveyStorage.setItem(ALL_SURVEYS_KEY, surveys)
+    await ctx.cache.surveys.setItem(ALL_SURVEYS_KEY, surveys)
 
     return surveys
   }),
@@ -99,8 +96,8 @@ export const surveyRouter = router({
       })
 
       await Promise.all([
-        surveyStorage.setItem(survey.id, survey),
-        surveyStorage.removeItem(ALL_SURVEYS_KEY),
+        ctx.cache.surveys.setItem(survey.id, survey),
+        ctx.cache.surveys.removeItem(ALL_SURVEYS_KEY),
       ])
 
       return {
@@ -133,8 +130,8 @@ export const surveyRouter = router({
       },
     })
 
-    await surveyStorage.setItem(clone.id, clone)
-    await surveyStorage.removeItem(ALL_SURVEYS_KEY)
+    await ctx.cache.surveys.setItem(clone.id, clone)
+    await ctx.cache.surveys.removeItem(ALL_SURVEYS_KEY)
 
     return clone
   }),
@@ -154,7 +151,7 @@ export const surveyRouter = router({
       data: input,
     })
 
-    await surveyStorage.setItem(survey.id, survey)
+    await ctx.cache.surveys.setItem(survey.id, survey)
 
     return survey
   }),
@@ -168,7 +165,7 @@ export const surveyRouter = router({
       where: { id: input.id },
     })
 
-    await surveyStorage.removeItem(ALL_SURVEYS_KEY)
-    await surveyStorage.removeItem(input.id)
+    await ctx.cache.surveys.removeItem(ALL_SURVEYS_KEY)
+    await ctx.cache.surveys.removeItem(input.id)
   }),
 })

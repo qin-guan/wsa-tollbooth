@@ -12,8 +12,7 @@ export async function createContext(_event: H3Event) {
   }
 
   return {
-    prisma: _event.context.prisma,
-    resend: _event.context.resend,
+    ..._event.context,
     session: await useSession(_event, config),
   }
 }

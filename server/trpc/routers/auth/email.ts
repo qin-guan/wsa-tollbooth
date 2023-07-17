@@ -50,7 +50,7 @@ export const emailSessionRouter = router({
         }),
         render(createSSRApp(VerificationCodeEmail, { appName: useRuntimeConfig().public.appName, verificationCode: token })),
       ])
-      await resend.sendEmail({
+      await ctx.resend.sendEmail({
         from: useRuntimeConfig().resend.fromAddress,
         to: email,
         subject: `${useRuntimeConfig().public.appName} - Login verification code`,

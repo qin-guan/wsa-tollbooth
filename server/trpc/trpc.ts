@@ -47,7 +47,7 @@ const authMiddleware = t.middleware(async (opts) => {
     })
   }
   else {
-    user = await prisma.user.findUnique({
+    user = await ctx.prisma.user.findUnique({
       where: { id: ctx.session.data.id },
     })
     if (user === null)

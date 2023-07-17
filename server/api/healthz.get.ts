@@ -1,10 +1,8 @@
-import { prisma } from '../utils/prisma'
-
 const startupTime = new Date()
 
 const handler = defineEventHandler(async (event) => {
   try {
-    await prisma.$queryRaw`SELECT 1;`
+    await event.context.prisma.$queryRaw`SELECT 1;`
   }
   catch (error) {
     throw createError({ statusCode: 500, statusMessage: 'DB failed initialization check' })

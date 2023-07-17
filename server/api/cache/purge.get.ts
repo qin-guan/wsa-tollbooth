@@ -11,7 +11,8 @@ export default defineEventHandler(async (event) => {
   const session = await useSession(event, config)
   if (!session.data.id) {
     throw createError({
-      status: 403,
+      statusCode: 403,
+      statusMessage: 'Unauthorized',
     })
   }
 

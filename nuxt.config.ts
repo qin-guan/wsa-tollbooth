@@ -3,8 +3,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   routeRules: {
     '/dashboard/surveys/*/print': { ssr: false },
-    '/s/*': { swr: 120 },
-    '/s/*/analytics': { swr: 30 },
   },
   modules: [
     '@unocss/nuxt',

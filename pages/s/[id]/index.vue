@@ -137,7 +137,7 @@ async function submit() {
           </div>
 
           <form v-else-if="formData" @submit.prevent="submit">
-            <div v-for="(question, idx) in survey.questions" :key="idx" mt-10>
+            <div v-for="(question, idx) in survey.questions" :key="idx" role="group" mt-15>
               <h2 text-2xl font-semibold>
                 {{ question.title }}
               </h2>
@@ -156,17 +156,19 @@ async function submit() {
                   />
                 </div>
 
-                <div v-else-if="question.type === 'mcq'" flex flex-col gap-3>
-                  <div v-for="(option, optionIdx) in question.options" :key="option" class="flex items-center">
+                <div v-else-if="question.type === 'mcq'" role="radiogroup" flex flex-col gap-3>
+                  <div v-for="(option, optionIdx) in question.options" :key="option" class="w-full flex items-center">
                     <RadioButton
                       v-model="
                         // @ts-expect-error Option does exist, but discriminated unions don't work well here
                         formData[idx].option
                       "
+                      :name="idx.toString()"
                       :value="optionIdx"
-                      :input-id="option"
+                      :input-id="`${idx}-${option}`"
+                      class="w-full"
                     />
-                    <label :for="option" class="ml-2">{{ option }}</label>
+                    <label :for="`${idx}-${option}`" class="ml-2 w-full">{{ option }}</label>
                   </div>
                 </div>
               </div>

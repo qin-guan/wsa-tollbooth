@@ -49,9 +49,9 @@ model Response {
   timestamp DateTime @default(now())
   data      Json
 
-  survey       Survey @relation(fields: [surveyId], references: [id])
+  survey       Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   surveyId     String
-  respondent   User   @relation(fields: [respondentId], references: [id])
+  respondent   User   @relation(fields: [respondentId], references: [id], onDelete: Cascade)
   respondentId String
 
   @@unique([surveyId, respondentId])

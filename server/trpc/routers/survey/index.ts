@@ -7,6 +7,7 @@ import type { QuestionsSchema, SurveyPermissionSchema } from '../../../../shared
 import { questionsSchema, surveyPermissionSchema } from '../../../../shared/survey'
 import { protectedProcedure, router } from '../../trpc'
 
+const ALL_SURVEYS_KEY = '__all_surveys'
 const baseStorage = useStorage('redis')
 const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
@@ -62,11 +63,11 @@ export const surveyRouter = router({
   }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
-    if (await surveyStorage.hasItem('__all_surveys'))
-      return await surveyStorage.getItem<Survey[]>('__all_surveys') ?? []
+    if (await surveyStorage.hasItem(ALL_SURVEYS_KEY))
+      return await surveyStorage.getItem<Survey[]>(ALL_SURVEYS_KEY) ?? []
 
     const surveys = await ctx.prisma.survey.findMany()
-    await surveyStorage.setItem('__all_surveys', surveys)
+    await surveyStorage.setItem(ALL_SURVEYS_KEY, surveys)
 
     return surveys
   }),
@@ -97,7 +98,10 @@ export const surveyRouter = router({
         data: input,
       })
 
-      await surveyStorage.setItem(survey.id, survey)
+      await Promise.all([
+        surveyStorage.setItem(survey.id, survey),
+        surveyStorage.removeItem(ALL_SURVEYS_KEY),
+      ])
 
       return {
         ...survey,
@@ -136,7 +140,7 @@ export const surveyRouter = router({
       where: { id: input.id },
     })
 
-    await surveyStorage.removeItem('__all_surveys')
+    await surveyStorage.removeItem(ALL_SURVEYS_KEY)
     await surveyStorage.removeItem(input.id)
   }),
 })

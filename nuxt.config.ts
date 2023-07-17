@@ -15,7 +15,6 @@ export default defineNuxtConfig({
   },
   css: [
     '@unocss/reset/tailwind-compat.css',
-    'primevue/resources/primevue.min.css',
     '~/styles/global.css',
   ],
   build: {

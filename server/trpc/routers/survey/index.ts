@@ -136,6 +136,7 @@ export const surveyRouter = router({
       where: { id: input.id },
     })
 
+    await surveyStorage.removeItem('__all_surveys')
     await surveyStorage.removeItem(input.id)
   }),
 })

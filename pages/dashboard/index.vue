@@ -9,12 +9,14 @@ import InputSwitch from 'primevue/inputswitch'
 import Badge from 'primevue/badge'
 import Skeleton from 'primevue/skeleton'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import { TRPCClientError } from '@trpc/client'
 
 useSeoMeta({
   title: 'Dashboard',
 })
 
+const confirm = useConfirm()
 const toast = useToast()
 const { $client } = useNuxtApp()
 const { data: surveys, pending: surveysPending, error: surveysError, refresh: surveyRefresh } = await $client.survey.list.useQuery(undefined, { lazy: true })
@@ -81,22 +83,31 @@ async function deleteWinner(id: string) {
   }
 }
 
-async function deleteSurvey(id: string) {
-  try {
-    await $client.survey.delete.mutate({
-      id,
-    })
-    await surveyRefresh()
-  }
-  catch (err) {
-    console.error(err)
-    if (err instanceof TRPCClientError) {
-      toast.add({
-        severity: 'error',
-        summary: err.message,
-      })
-    }
-  }
+async function deleteSurvey(event: any, id: string) {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to delete this survey?',
+    acceptClass: 'p-button-danger p-button-sm',
+    accept: async () => {
+      try {
+        await $client.survey.delete.mutate({
+          id,
+        })
+        await surveyRefresh()
+      }
+      catch (err) {
+        console.error(err)
+        if (err instanceof TRPCClientError) {
+          toast.add({
+            severity: 'error',
+            summary: err.message,
+          })
+        }
+      }
+    },
+    reject: () => {
+    },
+  })
 }
 </script>
 
@@ -157,10 +168,14 @@ async function deleteSurvey(id: string) {
           </Column>
           <Column header="Actions">
             <template #body="slotProps">
-              <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">
-                <Button label="Edit" size="small" link />
-              </NuxtLink>
-              <Button label="Delete" size="small" link @click="deleteSurvey(slotProps.data.id)"/>
+              <div flex>
+                <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">
+                  <Button label="Edit" size="small" link />
+                </NuxtLink>
+                <Button severity="danger" icon="" size="small" text @click="deleteSurvey($event, slotProps.data.id)">
+                  <div i-tabler-trash />
+                </Button>
+              </div>
             </template>
           </Column>
         </DataTable>

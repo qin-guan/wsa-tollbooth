@@ -1,7 +1,12 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { prefixStorage } from 'unstorage'
+import type { Survey } from '@prisma/client'
 import { protectedProcedure, router } from '../../trpc'
 import type { QuestionsSchema, SurveyPermissionSchema, SurveyResponseSchema } from '../../../../shared/survey'
+
+const baseStorage = useStorage('redis')
+const surveyStorage = prefixStorage(baseStorage, 'surveys')
 
 // TODO probably need a better name for all the functions here
 export const analyticsRouter = router({
@@ -17,11 +22,23 @@ export const analyticsRouter = router({
       if (ctx.session.user.admin)
         return next()
 
-      const survey = await ctx.prisma.survey.findUniqueOrThrow({
-        where: {
-          id: input.id,
-        },
-      })
+      let survey
+      if (await surveyStorage.hasItem(input.id)) {
+        survey = await surveyStorage.getItem<Survey>(input.id)
+        if (!survey) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+          })
+        }
+      }
+      else {
+        survey = await ctx.prisma.survey.findUniqueOrThrow({
+          where: {
+            id: input.id,
+          },
+        })
+      }
+
       const permissions = survey.permissions as SurveyPermissionSchema
       if (
         permissions
@@ -36,15 +53,28 @@ export const analyticsRouter = router({
       })
     })
     .query(async ({ ctx, input }) => {
-      const [responses, survey] = await Promise.all([ctx.prisma.response.findMany({
+      let survey
+      if (await surveyStorage.hasItem(input.id)) {
+        survey = await surveyStorage.getItem<Survey>(input.id)
+        if (!survey) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+          })
+        }
+      }
+      else {
+        survey = await ctx.prisma.survey.findUniqueOrThrow({
+          where: {
+            id: input.id,
+          },
+        })
+      }
+
+      const responses = await ctx.prisma.response.findMany({
         where: {
           surveyId: input.id,
         },
-      }), ctx.prisma.survey.findUniqueOrThrow({
-        where: {
-          id: input.id,
-        },
-      })])
+      })
 
       const questionsSchema = survey.questions as QuestionsSchema
 

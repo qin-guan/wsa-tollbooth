@@ -158,9 +158,9 @@ async function deleteSurvey(event: any, id: string) {
         </div>
 
         <DataTable v-else :value="surveys" table-style="width: 100%;">
-          <Column field="id" header="ID" style="width: 20%;" />
-          <Column field="title" header="Title" style="width: 50%" />
-          <Column field="workshop" header="Type" style="width: 20%">
+          <Column field="id" header="ID" sortable="true" style="width: 20%;" />
+          <Column field="title" header="Title" sortable="true" style="width: 50%" />
+          <Column field="workshop" header="Type" sortable="true" style="width: 20%">
             <template #body="slotProps">
               <Badge v-if="slotProps.data.workshop" value="Workshop" />
               <Badge v-else value="Booth" severity="warning" />
@@ -199,10 +199,10 @@ async function deleteSurvey(event: any, id: string) {
         </h3>
 
         <DataTable v-if="pastWinners" :value="pastWinners">
-          <Column field="id" header="ID" style="width: 30%" />
-          <Column field="name" header="Name" style="width 20%" />
-          <Column field="nric" header="NRIC" style="width: 20%" />
-          <Column field="phone" header="Phone" style="width: 20%" />
+          <Column field="id" header="ID" sortable="yes" style="width: 30%" />
+          <Column field="name" header="Name" sortable="yes" style="width: 20%" />
+          <Column field="nric" header="NRIC" sortable="yes" style="width: 20%" />
+          <Column field="phone" header="Phone" sortable="yes" style="width: 20%" />
           <Column header="Delete" style="width: 10%">
             <template #body="slotProps">
               <Button label="Delete" size="small" severity="danger" @click="deleteWinner(slotProps.data.id)" />

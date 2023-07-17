@@ -13,5 +13,4 @@ export default defineEventHandler((event) => {
     prisma = new PrismaClient()
 
   event.context.prisma = prisma
-  console.log('assigned prisma')
 })

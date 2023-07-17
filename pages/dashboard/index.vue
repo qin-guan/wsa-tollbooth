@@ -22,11 +22,18 @@ const { $client } = useNuxtApp()
 const { data: surveys, pending: surveysPending, error: surveysError, refresh: surveyRefresh } = await $client.survey.list.useQuery(undefined, { lazy: true })
 const { data: pastWinners, pending: pastWinnersPending, error: pastWinnersError, refresh: pastWinnersRefresh } = await $client.luckyDraw.pastWinners.useQuery(undefined, { lazy: true })
 
-const visible = ref(false)
 const createForm = reactive({
+  visible: false,
   title: '',
   description: '',
   workshop: false,
+  pending: false,
+})
+const copyForm = reactive({
+  visible: false,
+  id: '',
+  title: '',
+  description: '',
   pending: false,
 })
 
@@ -109,11 +116,47 @@ async function deleteSurvey(event: any, id: string) {
     },
   })
 }
+
+function copySurvey(id: string) {
+  const survey = surveys.value.find(survey => survey.id === id)
+  if (!survey)
+    return
+
+  copyForm.id = survey.id
+  copyForm.title = survey.title
+  copyForm.description = survey.description
+  copyForm.visible = true
+}
+
+async function copy() {
+  copyForm.pending = true
+  try {
+    await $client.survey.clone.mutate({
+      id: copyForm.id,
+      title: copyForm.title,
+      description: copyForm.description,
+    })
+    await surveyRefresh()
+    copyForm.visible = false
+  }
+  catch (err) {
+    console.error(err)
+    if (err instanceof TRPCClientError) {
+      toast.add({
+        severity: 'error',
+        summary: err.message,
+      })
+    }
+  }
+  finally {
+    copyForm.pending = false
+  }
+}
 </script>
 
 <template>
   <main mx-auto flex flex-col gap10 p-6 container>
-    <Dialog v-model:visible="visible" modal header="New survey" style="min-width: 300px;">
+    <Dialog v-model:visible="createForm.visible" modal header="New survey" style="min-width: 300px;">
       <form @submit.prevent="create">
         <div class="flex flex-col gap-2">
           <label for="title">Survey title</label>
@@ -140,6 +183,26 @@ async function deleteSurvey(event: any, id: string) {
       </form>
     </Dialog>
 
+    <Dialog v-model:visible="copyForm.visible" modal header="Copy survey" style="min-width: 300px;">
+      <form @submit.prevent="copy">
+        <div class="flex flex-col gap-2">
+          <label for="title">Survey title</label>
+          <InputText id="title" v-model="copyForm.title" required />
+        </div>
+
+        <br>
+
+        <div class="flex flex-col gap-2">
+          <label for="description">Survey description</label>
+          <Textarea id="description" v-model="copyForm.description" />
+        </div>
+
+        <br>
+
+        <Button type="submit" label="Copy" icon="" :loading="copyForm.pending" />
+      </form>
+    </Dialog>
+
     <section>
       <h2 text-3xl font-bold>
         Surveys
@@ -154,7 +217,7 @@ async function deleteSurvey(event: any, id: string) {
         <div v-if="surveys.length === 0" mt-20 flex flex-col items-center>
           <span text-xl font-semibold>No surveys</span>
           <br>
-          <Button size="small" label="Create new" @click="visible = true" />
+          <Button size="small" label="Create new" @click="createForm.visible = true" />
         </div>
 
         <DataTable v-else :value="surveys" table-style="width: 100%;">
@@ -172,6 +235,9 @@ async function deleteSurvey(event: any, id: string) {
                 <NuxtLink :to="`/dashboard/surveys/${slotProps.data.id}`">
                   <Button label="Edit" size="small" link />
                 </NuxtLink>
+                <Button icon="" size="small" text @click="copySurvey(slotProps.data.id)">
+                  <div i-tabler-copy />
+                </Button>
                 <Button severity="danger" icon="" size="small" text @click="deleteSurvey($event, slotProps.data.id)">
                   <div i-tabler-trash />
                 </Button>
@@ -182,7 +248,7 @@ async function deleteSurvey(event: any, id: string) {
 
         <br>
 
-        <Button v-if="surveys.length !== 0" size="small" label="Create new" @click="visible = true" />
+        <Button v-if="surveys.length !== 0" size="small" label="Create new" @click="createForm.visible = true" />
       </template>
     </section>
     <section>

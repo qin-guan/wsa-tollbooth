@@ -111,6 +111,34 @@ export const surveyRouter = router({
       }
     }),
 
+  clone: protectedProcedure.input(
+    z.object({
+      id: z.string(),
+      title: z.string().optional(),
+      description: z.string().optional(),
+    }),
+  ).mutation(async ({ ctx, input }) => {
+    const base = await ctx.prisma.survey.findUniqueOrThrow({
+      where: {
+        id: input.id,
+      },
+    })
+
+    const clone = await ctx.prisma.survey.create({
+      data: {
+        title: input.title ?? `Copy of ${base.title}`,
+        description: base.description,
+        workshop: base.workshop,
+        questions: base.questions ?? {},
+      },
+    })
+
+    await surveyStorage.setItem(clone.id, clone)
+    await surveyStorage.removeItem(ALL_SURVEYS_KEY)
+
+    return clone
+  }),
+
   update: protectedProcedure.input(
     z.object({
       id: z.string(),

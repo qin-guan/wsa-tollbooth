@@ -12,10 +12,12 @@ const pinoOptions = isDevelopment
       },
     }
   : {
-      target: '@axiomhq/pino',
-      options: {
-        dataset: useRuntimeConfig().axiom.dataset,
-        token: useRuntimeConfig().axiom.token,
+      transport: {
+        target: '@axiomhq/pino',
+        options: {
+          dataset: useRuntimeConfig().axiom.dataset,
+          token: useRuntimeConfig().axiom.token,
+        },
       },
     }
 

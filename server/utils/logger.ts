@@ -1,5 +1,5 @@
 import type { HttpLogger } from 'pino-http'
-import pino from 'pino-http'
+import pinoHttp from 'pino-http'
 import { isDevelopment } from 'std-env'
 
 const pinoOptions = isDevelopment
@@ -24,7 +24,7 @@ const pinoOptions = isDevelopment
 const globalForPino = globalThis as unknown as { pino: HttpLogger }
 
 export const logger
-  = globalForPino.pino || pino(pinoOptions)
+  = globalForPino.pino || pinoHttp(pinoOptions)
 
 if (isDevelopment)
   globalForPino.pino = logger

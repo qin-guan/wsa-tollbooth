@@ -14,7 +14,5 @@ export default defineNitroPlugin(() => {
     })
     : memoryDriver()
 
-  console.log(driver)
-
   storage.mount('redis', driver)
 })

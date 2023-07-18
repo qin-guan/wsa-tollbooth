@@ -115,6 +115,8 @@ export const responseRouter = router({
       },
     })
 
+    await ctx.cache.surveys.removeItem(`${ctx.session.user.id}-submitted`)
+
     return ctx.prisma.response.count({
       where: {
         respondentId: ctx.session.user.id,

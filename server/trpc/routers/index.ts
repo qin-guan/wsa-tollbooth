@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { publicProcedure, router } from '../trpc'
 import { authRouter } from './auth/auth.router'
-import { meRouter } from './me/me'
-import { surveyRouter } from './survey/survey'
-import { analyticsRouter } from './analytics/analytics'
-import { responseRouter } from './response/response'
-import { luckyDrawRouter } from './lucky-draw/lucky-draw'
+import { meRouter } from './me/me.router'
+import { surveyRouter } from './survey/survey.router'
+import { analyticsRouter } from './analytics/analytics.router'
+import { responseRouter } from './response/response.router'
+import { luckyDrawRouter } from './lucky-draw/lucky-draw.router'
 
 export const appRouter = router({
   hello: publicProcedure

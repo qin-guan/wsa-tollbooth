@@ -1,5 +1,6 @@
 import { type Prisma, type PrismaClient } from '@prisma/client'
 import { VerificationError } from './auth.error'
+import { compareHash } from './email.service'
 
 export async function verifyToken(
   prisma: PrismaClient,

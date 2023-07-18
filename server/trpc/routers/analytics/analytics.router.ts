@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import type { Survey } from '@prisma/client'
-import { protectedProcedure, router } from '../../trpc'
-import type { QuestionsSchema, SurveyPermissionSchema, SurveyResponseSchema } from '../../../../shared/survey'
+
+import { protectedProcedure, router } from '~/server/trpc/trpc'
+import type { QuestionsSchema, SurveyPermissionSchema, SurveyResponseSchema } from '~/shared/survey'
 
 // TODO probably need a better name for all the functions here
 export const analyticsRouter = router({

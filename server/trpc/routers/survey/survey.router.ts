@@ -2,9 +2,11 @@ import type { Survey } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import type { QuestionsSchema, SurveyPermissionSchema } from '../../../../shared/survey'
-import { questionsSchema, surveyPermissionSchema } from '../../../../shared/survey'
-import { protectedProcedure, router } from '../../trpc'
+
+import { protectedProcedure, router } from '~/server/trpc/trpc'
+
+import type { QuestionsSchema, SurveyPermissionSchema } from '~/shared/survey'
+import { questionsSchema, surveyPermissionSchema } from '~/shared/survey'
 
 const ALL_SURVEYS_KEY = '__all_surveys'
 

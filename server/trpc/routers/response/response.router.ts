@@ -1,7 +1,9 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import type { Survey } from '@prisma/client'
-import { protectedProcedure, router } from '../../trpc'
+import type { Prisma, Survey } from '@prisma/client'
+
+import { protectedProcedure, router } from '~/server/trpc/trpc'
+
 import type { SurveyPermissionSchema } from '~/shared/survey'
 import { surveyResponseSchema } from '~/shared/survey'
 
@@ -11,22 +13,41 @@ const surveyProtectedProcedure = protectedProcedure.input(
   }),
 )
 
+type UserIncludeSurvey = Prisma.UserGetPayload<{
+  include: {
+    surveyResponses: {
+      include: {
+        survey: true
+      }
+    }
+  }
+}>
+
 export const responseRouter = router({
   submitted: protectedProcedure
     .meta({ participants: true })
     .query(async ({ ctx }) => {
-      const data = await ctx.prisma.user.findUniqueOrThrow({
-        where: {
-          id: ctx.session.user.id,
-        },
-        include: {
-          surveyResponses: {
-            include: {
-              survey: true,
+      let data
+      if (await ctx.cache.users.hasItem(`${ctx.session.user.id}-submitted`)) {
+        data = await ctx.cache.users.getItem<UserIncludeSurvey>(`${ctx.session.user.id}-submitted`)
+        if (!data)
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+      }
+      else {
+        data = await ctx.prisma.user.findUniqueOrThrow({
+          where: {
+            id: ctx.session.user.id,
+          },
+          include: {
+            surveyResponses: {
+              include: {
+                survey: true,
+              },
             },
           },
-        },
-      })
+        })
+        await ctx.cache.users.setItem(`${ctx.session.user.id}-submitted`, data)
+      }
 
       return data.surveyResponses
     }),

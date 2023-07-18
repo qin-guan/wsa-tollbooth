@@ -33,6 +33,7 @@ export default defineNuxtConfig({
   },
 
   htmlValidator: {
+    logLevel: 'error',
     failOnError: true,
     options: {
       rules: {

@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import type { User } from '@prisma/client'
-import { protectedProcedure, router } from '../../trpc'
+
+import { defaultUserSelect } from '~/server/trpc/routers/user/user.select'
+import { protectedProcedure, router } from '~/server/trpc/trpc'
 
 export const meRouter = router({
   get: protectedProcedure

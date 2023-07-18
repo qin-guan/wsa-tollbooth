@@ -7,6 +7,7 @@
  * @see https://trpc.io/docs/v10/router
  * @see https://trpc.io/docs/v10/procedures
  */
+
 import type { User } from '@prisma/client'
 import { TRPCError, initTRPC } from '@trpc/server'
 import superjson from 'superjson'

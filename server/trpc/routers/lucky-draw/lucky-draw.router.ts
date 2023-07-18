@@ -1,7 +1,8 @@
 import { getRandomValues } from 'node:crypto'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { protectedProcedure, router } from '../../trpc'
+
+import { protectedProcedure, router } from '~/server/trpc/trpc'
 
 function getRandomIntInclusive(min: number, max: number) {
   const randomBuffer = new Uint32Array(1)

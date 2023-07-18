@@ -1,5 +1,5 @@
-import { router } from '../../trpc'
-import { emailSessionRouter } from './email'
+import { emailSessionRouter } from './email.router'
+import { router } from '~/server/trpc/trpc'
 
 export const authRouter = router({
   email: emailSessionRouter,

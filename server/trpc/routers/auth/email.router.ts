@@ -3,10 +3,12 @@ import { z } from 'zod'
 import { render } from '@qingu/vue-email'
 import { createSSRApp } from 'vue'
 
-import { verifyToken } from '../../services/auth'
-import { VerificationError } from '../../services/auth.error'
-import { publicProcedure, router } from '../../trpc'
-import { VerificationCodeEmail } from '../../../emails/VerificationCodeEmail'
+import { VerificationError } from './auth.error'
+import { verifyToken } from './auth.service'
+import { createTokenHash, createVfnToken } from './email.service'
+import { publicProcedure, router } from '~/server/trpc/trpc'
+import { VerificationCodeEmail } from '~/server/emails/verification-code'
+import { defaultUserSelect } from '~/server/trpc/routers/user/user.select'
 
 const admins = [
   'qinguan20040914@gmail.com',

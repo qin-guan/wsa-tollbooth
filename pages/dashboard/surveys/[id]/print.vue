@@ -22,7 +22,7 @@ useSeoMeta({
 
 <template>
   <div class="h-4/5 flex flex-col items-center justify-center">
-    <h1 class="text-6xl font-bold">
+    <h1 class="text-center text-5xl font-bold">
       {{ survey?.title }}
     </h1>
     <br>

@@ -23,12 +23,18 @@ devDependencies:
   '@nuxtjs/html-validator':
     specifier: ^1.5.1
     version: 1.5.1
+  '@nuxtjs/turnstile':
+    specifier: ^0.5.0
+    version: 0.5.0
   '@prisma/client':
     specifier: 5.0.0
     version: 5.0.0(prisma@5.0.0)
   '@qingu/vue-email':
     specifier: ^1.0.23
     version: 1.0.23(vue@3.3.4)
+  '@tanstack/vue-query':
+    specifier: ^4.29.25
+    version: 4.29.25(vue@3.3.4)
   '@trpc/client':
     specifier: ^10.34.0
     version: 10.34.0(@trpc/server@10.34.0)
@@ -131,6 +137,9 @@ devDependencies:
   vue:
     specifier: ^3.3.4
     version: 3.3.4
+  vue-email:
+    specifier: ^0.4.0
+    version: 0.4.0(vue@3.3.4)
   vue-tsc:
     specifier: ^1.8.4
     version: 1.8.4(typescript@5.1.6)
@@ -1739,6 +1748,17 @@ packages:
       - supports-color
     dev: true
 
+  /@nuxtjs/turnstile@0.5.0:
+    resolution: {integrity: sha512-EmEnYNDRavdmv9HXnInHVR5nSvjDG92s6pOrxd+ugqImkrnIQJttSd4DPq9UNhwUI/wLUL7z3VclVyQwNT2O7Q==}
+    dependencies:
+      '@nuxt/kit': 3.6.2
+      defu: 6.1.2
+      pathe: 1.1.1
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
+    dev: true
+
   /@pkgjs/parseargs@0.11.0:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
@@ -2017,6 +2037,33 @@ packages:
       tuf-js: 1.1.7
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /@tanstack/match-sorter-utils@8.8.4:
+    resolution: {integrity: sha512-rKH8LjZiszWEvmi01NR72QWZ8m4xmXre0OOwlRGnjU01Eqz/QnN+cqpty2PJ0efHblq09+KilvyR7lsbzmXVEw==}
+    engines: {node: '>=12'}
+    dependencies:
+      remove-accents: 0.4.2
+    dev: true
+
+  /@tanstack/query-core@4.29.25:
+    resolution: {integrity: sha512-DI4y4VC6Uw4wlTpOocEXDky69xeOScME1ezLKsj+hOk7DguC9fkqXtp6Hn39BVb9y0b5IBrY67q6kIX623Zj4Q==}
+    dev: true
+
+  /@tanstack/vue-query@4.29.25(vue@3.3.4):
+    resolution: {integrity: sha512-gTEjPDOgT9be+WwkO8+7yKLzwlR3FDA4g9p+CzXmdkxbAZAeBxFpyvayiegqGYh5mhJKfC3FnkQ3uqII7GIOpA==}
+    peerDependencies:
+      '@vue/composition-api': ^1.1.2
+      vue: ^2.5.0 || ^3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      '@tanstack/match-sorter-utils': 8.8.4
+      '@tanstack/query-core': 4.29.25
+      '@vue/devtools-api': 6.5.0
+      vue: 3.3.4
+      vue-demi: 0.13.11(vue@3.3.4)
     dev: true
 
   /@tootallnate/once@2.0.0:
@@ -9144,6 +9191,10 @@ packages:
       unified: 10.1.2
     dev: true
 
+  /remove-accents@0.4.2:
+    resolution: {integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==}
+    dev: true
+
   /require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -10943,6 +10994,21 @@ packages:
       ufo: 1.1.2
     dev: true
 
+  /vue-demi@0.13.11(vue@3.3.4):
+    resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
+    engines: {node: '>=12'}
+    hasBin: true
+    requiresBuild: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.3.4
+    dev: true
+
   /vue-demi@0.14.5(vue@3.3.4):
     resolution: {integrity: sha512-o9NUVpl/YlsGJ7t+xuqJKx8EBGf1quRhCiT6D/J0pfwmk9zUwYkC7yrF4SZCe6fETvSM3UNL2edcbYrSyc4QHA==}
     engines: {node: '>=12'}
@@ -10960,6 +11026,18 @@ packages:
 
   /vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
+    dev: true
+
+  /vue-email@0.4.0(vue@3.3.4):
+    resolution: {integrity: sha512-fqRNsKpeNOP1QPYioWRoeZycVBjLXZx0B6BMiGmpiayWth3XCM0cRnbHjeSKzmLAKescif+IZipv6IEBUewmwQ==}
+    peerDependencies:
+      '@nuxt/kit': ^3.6.3
+      vue: ^3.3.4
+    peerDependenciesMeta:
+      '@nuxt/kit':
+        optional: true
+    dependencies:
+      vue: 3.3.4
     dev: true
 
   /vue-eslint-parser@9.3.1(eslint@8.44.0):

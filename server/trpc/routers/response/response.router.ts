@@ -3,7 +3,6 @@ import { TRPCError } from '@trpc/server'
 import type { Prisma, Survey, User } from '@prisma/client'
 
 import { protectedProcedure, publicProcedure, router } from '~/server/trpc/trpc'
-
 import type { SurveyPermissionSchema } from '~/shared/survey'
 import { surveyResponseSchema } from '~/shared/survey'
 
@@ -112,9 +111,17 @@ export const responseRouter = router({
     .input(
       z.object({
         data: surveyResponseSchema,
+        token: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      if (!(await verifyTurnstileToken(input.token)).success) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Failed turnstile',
+        })
+      }
+
       let user
       if (!ctx.session.data.id) {
         user = await ctx.prisma.user.create({

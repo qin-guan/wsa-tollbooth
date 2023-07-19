@@ -30,6 +30,7 @@ const formData = reactive({
   name: '',
   nric: '',
   phone: '',
+  token: '',
   pending: false,
   showDetails: true,
 })
@@ -77,6 +78,7 @@ async function create() {
       name: formData.name,
       nric: formData.nric,
       phone: formData.phone,
+      token: formData.token,
     })
     toast.add({
       summary: 'Profile updated!',
@@ -156,6 +158,8 @@ async function create() {
               </div>
 
               <div>
+                <NuxtTurnstile v-model="formData.token" />
+                <br>
                 <Button label="Submit!" type="submit" size="small" :loading="formData.pending" />
               </div>
             </form>

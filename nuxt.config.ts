@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxtjs/html-validator',
     '@nuxt/image',
+    '@nuxtjs/turnstile',
   ],
   typescript: {
     strict: true,
@@ -45,6 +46,10 @@ export default defineNuxtConfig({
     },
   },
 
+  turnstile: {
+    siteKey: '0x4AAAAAAAHltnqiAec0Hcgc',
+  },
+
   image: {},
 
   runtimeConfig: {
@@ -58,6 +63,10 @@ export default defineNuxtConfig({
 
     sessionSecret: '',
     sessionName: 'h3',
+
+    turnstile: {
+      secretKey: '',
+    },
 
     axiom: {
       dataset: '',

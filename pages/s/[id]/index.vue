@@ -5,7 +5,6 @@ import Textarea from 'primevue/textarea'
 import Card from 'primevue/card'
 import { useToast } from 'primevue/usetoast'
 
-import { TRPCClientError } from '@trpc/client'
 import type { SurveyResponseSchema } from '~/shared/survey'
 
 definePageMeta({
@@ -25,6 +24,7 @@ useSeoMeta({
 })
 
 const formData = ref<SurveyResponseSchema | null>(null)
+const turnstileToken = ref<string>('')
 const pending = ref(false)
 
 const responded = computed(() => {
@@ -75,6 +75,7 @@ async function submit() {
     await $client.response.create.mutate({
       surveyId: route.params.id as string,
       data: formData.value,
+      token: turnstileToken.value,
     })
     await navigateTo({
       path: '/thanks',
@@ -85,12 +86,11 @@ async function submit() {
   }
   catch (err) {
     console.error(err)
-    if (err instanceof TRPCClientError) {
-      toast.add({
-        severity: 'error',
-        summary: err.message,
-      })
-    }
+    toast.add({
+      severity: 'error',
+      // @ts-expect-error for some reason the TRPCClientError instanceof does not work
+      summary: err.message,
+    })
   }
   finally {
     pending.value = false
@@ -99,7 +99,7 @@ async function submit() {
 </script>
 
 <template>
-  <div p-6 lg:px-30>
+  <div p-6 pb-30 lg:px-30>
     <main>
       <DashboardError v-if="surveyError" v-bind="surveyError" />
       <template v-else-if="survey">
@@ -175,6 +175,8 @@ async function submit() {
             </div>
 
             <div mt-8>
+              <NuxtTurnstile v-model="turnstileToken" />
+              <br>
               <Button label="Submit" type="submit" :loading="pending" />
             </div>
           </form>

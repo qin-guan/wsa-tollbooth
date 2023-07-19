@@ -1,8 +1,11 @@
 const startupTime = new Date()
+let prismaIsGood = false
 
 const handler = defineEventHandler(async (event) => {
   try {
-    await event.context.prisma.$queryRaw`SELECT 1;`
+    if (!prismaIsGood)
+      await event.context.prisma.$queryRaw`SELECT 1;`
+    prismaIsGood = true
   }
   catch (error) {
     throw createError({ statusCode: 500, statusMessage: 'DB failed initialization check' })

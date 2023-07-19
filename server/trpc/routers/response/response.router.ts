@@ -1,13 +1,19 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import type { Prisma, Survey } from '@prisma/client'
+import type { Prisma, Survey, User } from '@prisma/client'
 
-import { protectedProcedure, router } from '~/server/trpc/trpc'
+import { protectedProcedure, publicProcedure, router } from '~/server/trpc/trpc'
 
 import type { SurveyPermissionSchema } from '~/shared/survey'
 import { surveyResponseSchema } from '~/shared/survey'
 
 const surveyProtectedProcedure = protectedProcedure.input(
+  z.object({
+    surveyId: z.string(),
+  }),
+)
+
+const surveyPublicProcedure = publicProcedure.input(
   z.object({
     surveyId: z.string(),
   }),
@@ -102,25 +108,44 @@ export const responseRouter = router({
       return data
     }),
 
-  create: surveyProtectedProcedure.meta({ participants: true }).input(
-    z.object({
-      data: surveyResponseSchema,
+  create: surveyPublicProcedure
+    .input(
+      z.object({
+        data: surveyResponseSchema,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      let user
+      if (!ctx.session.data.id) {
+        user = await ctx.prisma.user.create({
+          data: {
+            admin: false,
+          },
+        })
+        await ctx.session.update({
+          id: user.id,
+        })
+      }
+      else {
+        user = await ctx.cache.users.getItem<User>(ctx.session.data.id)
+        user ??= await ctx.prisma.user.findUnique({
+          where: { id: ctx.session.data.id },
+        })
+
+        if (user === null)
+          throw new TRPCError({ code: 'UNAUTHORIZED' })
+      }
+
+      await ctx.prisma.response.create({
+        data: {
+          surveyId: input.surveyId,
+          respondentId: user.id,
+          data: input.data,
+        },
+      })
+
+      await ctx.cache.surveys.removeItem(`${user.id}-submitted`)
+
+      return true
     }),
-  ).mutation(async ({ ctx, input }) => {
-    await ctx.prisma.response.create({
-      data: {
-        surveyId: input.surveyId,
-        respondentId: ctx.session.user.id,
-        data: input.data,
-      },
-    })
-
-    await ctx.cache.surveys.removeItem(`${ctx.session.user.id}-submitted`)
-
-    return ctx.prisma.response.count({
-      where: {
-        respondentId: ctx.session.user.id,
-      },
-    })
-  }),
 })

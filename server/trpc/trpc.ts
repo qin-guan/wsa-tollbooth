@@ -31,39 +31,19 @@ const t = initTRPC
   })
 
 const authMiddleware = t.middleware(async ({ next, ctx, meta }) => {
-  let user
-  if (!ctx.session.data.id) {
-    if (!meta?.participants)
-      throw new TRPCError({ code: 'UNAUTHORIZED' })
+  if (!ctx.session.data.id)
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
 
-    user = await ctx.prisma.user.create({
-      data: {
-        admin: false,
-      },
-    })
+  let user = await ctx.cache.users.getItem<User>(ctx.session.data.id)
+  user ??= await ctx.prisma.user.findUnique({
+    where: { id: ctx.session.data.id },
+  })
 
-    await ctx.cache.users.setItem(user.id, user)
+  if (user === null)
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
 
-    await ctx.session.update({
-      id: user.id,
-    })
-  }
-  else {
-    if (await ctx.cache.users.hasItem(ctx.session.data.id)) {
-      user = await ctx.cache.users.getItem<User>(ctx.session.data.id)
-    }
-    else {
-      user = await ctx.prisma.user.findUnique({
-        where: { id: ctx.session.data.id },
-      })
-    }
-
-    if (user === null)
-      throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-    if (!meta?.participants && !user.admin)
-      throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
+  if (!meta?.participants && !user.admin)
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
 
   return next({
     ctx: {

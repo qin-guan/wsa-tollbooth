@@ -20,7 +20,8 @@ export const meRouter = router({
       return user
     }),
   update: protectedProcedure
-    .meta({ participants: true }).input(
+    .meta({ participants: true })
+    .input(
       z.object({
         name: z.string(),
         nric: z.string().regex(/\d{3}[A-Z]/),

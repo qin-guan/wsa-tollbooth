@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 
-import { protectedProcedure, router } from '~/server/trpc/trpc'
+import { protectedProcedure, publicProcedure, router } from '~/server/trpc/trpc'
 
 import type { QuestionsSchema, SurveyPermissionSchema } from '~/shared/survey'
 import { questionsSchema, surveyPermissionSchema } from '~/shared/survey'
@@ -11,55 +11,57 @@ import { questionsSchema, surveyPermissionSchema } from '~/shared/survey'
 const ALL_SURVEYS_KEY = '__all_surveys'
 
 export const surveyRouter = router({
-  get: protectedProcedure.meta({ participants: true }).input(
-    z.object({
-      id: z.string(),
-    }),
-  ).query(async ({ ctx, input }) => {
-    if (await ctx.cache.surveys.hasItem(input.id)) {
-      const survey = await ctx.cache.surveys.getItem<Survey>(input.id)
-      if (!survey) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-        })
-      }
-
-      return {
-        ...survey,
-        questions: survey?.questions as QuestionsSchema,
-        // Fallback to [] as it could be null
-        permissions: (survey?.permissions ?? []) as SurveyPermissionSchema,
-      }
-    }
-
-    try {
-      const survey = await ctx.prisma.survey.findUniqueOrThrow({
-        where: {
-          id: input.id,
-        },
-      })
-
-      await ctx.cache.surveys.setItem(input.id, survey)
-
-      return {
-        ...survey,
-        questions: survey.questions as QuestionsSchema,
-        // Fallback to [] as it could be null
-        permissions: (survey.permissions ?? []) as SurveyPermissionSchema,
-      }
-    }
-    catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') {
+  get: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      if (await ctx.cache.surveys.hasItem(input.id)) {
+        const survey = await ctx.cache.surveys.getItem<Survey>(input.id)
+        if (!survey) {
           throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Survey not found',
-            cause: err,
+            code: 'INTERNAL_SERVER_ERROR',
           })
         }
+
+        return {
+          ...survey,
+          questions: survey?.questions as QuestionsSchema,
+          // Fallback to [] as it could be null
+          permissions: (survey?.permissions ?? []) as SurveyPermissionSchema,
+        }
       }
-    }
-  }),
+
+      try {
+        const survey = await ctx.prisma.survey.findUniqueOrThrow({
+          where: {
+            id: input.id,
+          },
+        })
+
+        await ctx.cache.surveys.setItem(input.id, survey)
+
+        return {
+          ...survey,
+          questions: survey.questions as QuestionsSchema,
+          // Fallback to [] as it could be null
+          permissions: (survey.permissions ?? []) as SurveyPermissionSchema,
+        }
+      }
+      catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+          if (err.code === 'P2025') {
+            throw new TRPCError({
+              code: 'NOT_FOUND',
+              message: 'Survey not found',
+              cause: err,
+            })
+          }
+        }
+      }
+    }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
     if (await ctx.cache.surveys.hasItem(ALL_SURVEYS_KEY))

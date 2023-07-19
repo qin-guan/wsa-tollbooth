@@ -11,9 +11,11 @@ export async function createContext(_event: H3Event) {
     password: useRuntimeConfig().sessionSecret,
   }
 
+  const session = await useSession(_event, config)
+
   return {
     ..._event.context,
-    session: await useSession(_event, config),
+    session,
   }
 }
 

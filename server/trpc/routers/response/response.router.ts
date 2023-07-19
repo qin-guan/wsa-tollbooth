@@ -28,8 +28,8 @@ export const responseRouter = router({
     .meta({ participants: true })
     .query(async ({ ctx }) => {
       let data
-      if (await ctx.cache.users.hasItem(`${ctx.session.user.id}-submitted`)) {
-        data = await ctx.cache.users.getItem<UserIncludeSurvey>(`${ctx.session.user.id}-submitted`)
+      if (await ctx.cache.surveys.hasItem(`${ctx.session.user.id}-submitted`)) {
+        data = await ctx.cache.surveys.getItem<UserIncludeSurvey>(`${ctx.session.user.id}-submitted`)
         if (!data)
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
       }
@@ -46,7 +46,7 @@ export const responseRouter = router({
             },
           },
         })
-        await ctx.cache.users.setItem(`${ctx.session.user.id}-submitted`, data)
+        await ctx.cache.surveys.setItem(`${ctx.session.user.id}-submitted`, data)
       }
 
       return data.surveyResponses

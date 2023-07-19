@@ -19,7 +19,7 @@ const resolvedTheme = computed(() => {
   if (cookieRaw.value)
     theme = cookieRaw.value
 
-  return `https://cdn.jsdelivr.net/npm/primevue@latest/resources/themes/${theme}/theme.css`
+  return `/themes/${theme}/theme.css`
 })
 </script>
 

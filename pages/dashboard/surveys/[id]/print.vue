@@ -9,8 +9,8 @@ const data = computed(() => {
 })
 
 const qrcode = useQRCode(data.value, {
-  type: 'image/webp',
-  width: 500,
+  type: 'image/png',
+  width: 1000,
 })
 
 const { data: survey } = await $client.survey.get.useQuery({ id: route.params.id as string })

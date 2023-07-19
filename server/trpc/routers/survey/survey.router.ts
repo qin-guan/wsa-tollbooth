@@ -153,7 +153,10 @@ export const surveyRouter = router({
       data: input,
     })
 
-    await ctx.cache.surveys.setItem(survey.id, survey)
+    await Promise.all([
+      ctx.cache.surveys.setItem(survey.id, survey),
+      ctx.cache.surveys.removeItem(ALL_SURVEYS_KEY),
+    ])
 
     return survey
   }),

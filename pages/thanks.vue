@@ -158,8 +158,6 @@ async function create() {
               </div>
 
               <div>
-                <NuxtTurnstile v-model="formData.token" />
-                <br>
                 <Button label="Submit!" type="submit" size="small" :loading="formData.pending" />
               </div>
             </form>
@@ -234,6 +232,9 @@ async function create() {
           </div>
         </div>
       </section>
+
+      <br>
+      <NuxtTurnstile v-model="formData.token" />
     </main>
   </div>
 </template>

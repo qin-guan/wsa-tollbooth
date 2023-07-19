@@ -7,10 +7,6 @@ import { useToast } from 'primevue/usetoast'
 
 import type { SurveyResponseSchema } from '~/shared/survey'
 
-definePageMeta({
-  middleware: ['participant'],
-})
-
 const { $client } = useNuxtApp()
 
 const route = useRoute()

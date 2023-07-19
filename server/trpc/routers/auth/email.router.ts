@@ -15,6 +15,7 @@ const admins = [
   'cattolation@protonmail.com',
   's10223298@connect.np.edu.sg',
   'skyruspreyas@gmail.com',
+  's10221930@connect.np.edu.sg',
 ]
 
 export const emailSessionRouter = router({

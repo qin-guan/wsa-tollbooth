@@ -24,6 +24,7 @@ export const luckyDrawRouter = router({
       },
     })
   }),
+
   deleteWinner: protectedProcedure.input(
     z.object({
       id: z.string(),
@@ -38,11 +39,23 @@ export const luckyDrawRouter = router({
       },
     })
   }),
+
   draw: protectedProcedure.mutation(async ({ ctx }) => {
     const [byBooths, byWorkshops, previousWinners] = await Promise.all([
       ctx.prisma.response.groupBy({
         by: ['respondentId'],
         where: {
+          respondent: {
+            name: {
+              not: null,
+            },
+            nric: {
+              not: null,
+            },
+            phone: {
+              not: null,
+            },
+          },
           survey: {
             workshop: false,
           },
@@ -58,6 +71,17 @@ export const luckyDrawRouter = router({
       ctx.prisma.response.groupBy({
         by: ['respondentId'],
         where: {
+          respondent: {
+            name: {
+              not: null,
+            },
+            nric: {
+              not: null,
+            },
+            phone: {
+              not: null,
+            },
+          },
           survey: {
             workshop: true,
           },

@@ -24,7 +24,7 @@ export const meRouter = router({
     .meta({ participants: true })
     .input(
       z.object({
-        name: z.string(),
+        name: z.string().min(1),
         nric: z.string().regex(/\d{3}[A-Z]/),
         phone: z.string().regex(/[689]\d{3}\s\d{4}/),
         token: z.string(),

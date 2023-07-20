@@ -1,5 +1,5 @@
 app = "wsa-tollbooth"
-primary_region = "ams"
+primary_region = "sin"
 
 kill_signal = "SIGINT"
 kill_timeout = 5

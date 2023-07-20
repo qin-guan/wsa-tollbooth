@@ -24,21 +24,29 @@ export const emailSessionRouter = router({
     .input(
       z.object({
         email: z.string().email(),
+        token: z.string(),
       }),
     )
-    .mutation(async ({ ctx, input: { email } }) => {
+    .mutation(async ({ ctx, input }) => {
+      if (!(await verifyTurnstileToken(input.token)).success) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Failed captcha. Please try again.',
+        })
+      }
+
       // TODO: instead of storing expires, store issuedAt to calculate when the next otp can be re-issued
       // TODO: rate limit this endpoint also
       const expires = new Date(Date.now() + useRuntimeConfig().otpExpiry * 1000)
       const token = createVfnToken()
-      const hashedToken = createTokenHash(token, email)
+      const hashedToken = createTokenHash(token, input.email)
 
       // May have one of them fail,
       // so users may get an email but not have the token saved, but that should be fine.
       const [_, html] = await Promise.all([
         ctx.prisma.verificationToken.upsert({
           where: {
-            identifier: email,
+            identifier: input.email,
           },
           update: {
             token: hashedToken,
@@ -46,26 +54,30 @@ export const emailSessionRouter = router({
             attempts: 0,
           },
           create: {
-            identifier: email,
+            identifier: input.email,
             token: hashedToken,
             expires,
           },
         }),
         render(createSSRApp(VerificationCodeEmail, { appName: useRuntimeConfig().public.appName, verificationCode: token })),
       ])
+
       await ctx.resend.sendEmail({
         from: useRuntimeConfig().resend.fromAddress,
-        to: email,
+        to: input.email,
         subject: `${useRuntimeConfig().public.appName} - Login verification code`,
         html,
       })
-      return email
+
+      return input.email
     }),
+
   logout: publicProcedure
     .mutation(async ({ ctx }) => {
       await ctx.session.clear()
       return true
     }),
+
   verifyOtp: publicProcedure
     .input(
       z.object({

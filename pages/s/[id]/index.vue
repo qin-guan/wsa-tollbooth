@@ -3,7 +3,9 @@ import Button from 'primevue/button'
 import RadioButton from 'primevue/radiobutton'
 import Textarea from 'primevue/textarea'
 import Card from 'primevue/card'
+import Skeleton from 'primevue/skeleton'
 import { useToast } from 'primevue/usetoast'
+import { StorageSerializers } from '@vueuse/core'
 
 import type { SurveyResponseSchema } from '~/shared/survey'
 
@@ -19,7 +21,7 @@ useSeoMeta({
   title: survey.value?.title ?? 'Loading...',
 })
 
-const formData = ref<SurveyResponseSchema | null>(null)
+const formData = useLocalStorage<SurveyResponseSchema | null>(route.params.id as string, null, { serializer: StorageSerializers.object, listenToStorageChanges: true })
 const turnstileToken = ref<string>('')
 const pending = ref(false)
 
@@ -36,6 +38,13 @@ const responded = computed(() => {
 watch(survey, (value) => {
   if (!value)
     return
+  const sameLength = formData.value?.length === value.questions.length
+  const sameTypes = formData.value?.every((question, idx) => {
+    return question.type === value.questions[idx].type
+  })
+  if (sameLength && sameTypes)
+    return
+
   const initFormData: SurveyResponseSchema = value.questions.map((question) => {
     if (question.type === 'mcq') {
       return {
@@ -133,48 +142,59 @@ async function submit() {
           </div>
 
           <form v-else-if="formData" @submit.prevent="submit">
-            <div v-for="(question, idx) in survey.questions" :key="idx" role="group" mt-15>
-              <h2 text-2xl font-semibold>
-                {{ question.title }}
-              </h2>
-              <span>
-                {{ question.description }}
-              </span>
-
-              <div mt-4>
-                <div v-if="question.type === 'text'">
-                  <Textarea
-                    v-model="
-                      // @ts-expect-error Answer does exist, but discriminated unions don't work well here
-                      formData[idx].answer
-                    "
-                    required class="w-full" placeholder="Your response here"
-                  />
+            <ClientOnly>
+              <!-- Need ClientOnly if not reading localStorage will cause hydration mismatch -->
+              <template #fallback>
+                <div mt-15 flex flex-col gap4>
+                  <Skeleton height="50px" />
+                  <Skeleton height="75px" />
+                  <Skeleton height="500px" />
                 </div>
+              </template>
 
-                <div v-else-if="question.type === 'mcq'" role="radiogroup" flex flex-col gap-3>
-                  <div v-for="(option, optionIdx) in question.options" :key="option" class="w-full flex items-center">
-                    <RadioButton
+              <div v-for="(question, idx) in survey.questions" :key="idx" role="group" mt-15>
+                <h2 text-2xl font-semibold>
+                  {{ question.title }}
+                </h2>
+                <span>
+                  {{ question.description }}
+                </span>
+
+                <div mt-4>
+                  <div v-if="question.type === 'text'">
+                    <Textarea
                       v-model="
-                        // @ts-expect-error Option does exist, but discriminated unions don't work well here
-                        formData[idx].option
+                        // @ts-expect-error Answer does exist, but discriminated unions don't work well here
+                        formData[idx].answer
                       "
-                      :name="idx.toString()"
-                      :value="optionIdx"
-                      :input-id="`${idx}-${option}`"
-                      class="w-full"
+                      required class="w-full" placeholder="Your response here"
                     />
-                    <label :for="`${idx}-${option}`" class="ml-2 w-full">{{ option }}</label>
+                  </div>
+
+                  <div v-else-if="question.type === 'mcq'" role="radiogroup" flex flex-col gap-3>
+                    <div v-for="(option, optionIdx) in question.options" :key="option" class="w-full flex items-center">
+                      <RadioButton
+                        v-model="
+                          // @ts-expect-error Option does exist, but discriminated unions don't work well here
+                          formData[idx].option
+                        "
+                        :name="idx.toString()"
+                        :value="optionIdx"
+                        :input-id="`${idx}-${option}`"
+                        class="w-full"
+                      />
+                      <label :for="`${idx}-${option}`" class="ml-2 w-full">{{ option }}</label>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div mt-8>
-              <NuxtTurnstile v-model="turnstileToken" />
-              <br>
-              <Button label="Submit" type="submit" :loading="pending" />
-            </div>
+              <div mt-8>
+                <NuxtTurnstile v-model="turnstileToken" />
+                <br>
+                <Button label="Submit" type="submit" :loading="pending" />
+              </div>
+            </ClientOnly>
           </form>
         </div>
       </template>

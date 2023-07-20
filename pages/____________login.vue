@@ -15,18 +15,23 @@ const formData = reactive<{
   otp: string
   pending: boolean
   stage: 'email' | 'otp'
+  token: string
   error?: string
 }>({
   email: '',
   otp: '',
   pending: false,
+  token: '',
   stage: 'email',
 })
 
 async function generateOtp() {
   formData.pending = true
   try {
-    await $client.auth.email.login.mutate(formData)
+    await $client.auth.email.login.mutate({
+      email: formData.email,
+      token: formData.token,
+    })
     formData.stage = 'otp'
   }
   catch (err) {
@@ -87,6 +92,8 @@ async function verifyOtp() {
               </div>
 
               <div mt6>
+                <NuxtTurnstile v-model="formData.token" />
+                <br>
                 <Button type="submit" :loading="formData.pending" icon="" icon-pos="right" label="Get OTP" />
               </div>
             </form>

@@ -118,7 +118,7 @@ export const responseRouter = router({
       if (!(await verifyTurnstileToken(input.token)).success) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'Failed turnstile',
+          message: 'Failed captcha. Please try again.',
         })
       }
 

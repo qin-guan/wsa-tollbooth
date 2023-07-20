@@ -19,7 +19,7 @@ const items = ref([
 
 async function logout() {
   await $client.auth.email.logout.mutate()
-  navigateTo('/login')
+  navigateTo('/____________login')
 }
 
 function toggle(event: any) {

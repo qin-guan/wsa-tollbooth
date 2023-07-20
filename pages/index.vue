@@ -17,7 +17,6 @@ const { data: me } = await $client.me.get.useQuery(undefined, { lazy: true })
       </NuxtLink>
 
       <Button v-if="me && me.admin" label="Dashboard" @click="$router.push('dashboard')" />
-      <Button v-else label="Login" @click="$router.push('login')" />
     </header>
     <main>
       <section
@@ -30,9 +29,6 @@ const { data: me } = await $client.me.get.useQuery(undefined, { lazy: true })
           <p class="mb-6 lg:text-xl md:text-lg">
             If you are a participant, please scan QR codes available at booths to get started.
           </p>
-          <div flex="~ gap-2">
-            <Button rounded label="Get started" @click="$router.push('/login')" />
-          </div>
         </div>
         <div py-20>
           <UndrawDog mx-auto max-h-sm />

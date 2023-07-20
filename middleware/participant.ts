@@ -3,5 +3,5 @@ export default defineNuxtRouteMiddleware(async () => {
 
   const { error } = await $client.me.get.useQuery()
   if (error.value?.data?.code === 'UNAUTHORIZED')
-    return '/login'
+    return '/'
 })

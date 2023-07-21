@@ -77,7 +77,7 @@ useSeoMeta({
         </div>
       </Dialog>
 
-      <NuxtImg preload fit="contain" width="135" height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
+      <NuxtImg preload fit="inside" width="135" height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
 
       <Skeleton v-if="surveyPending" height="45px" />
       <h1 v-else-if="survey" mt8 text-xl font-bold>

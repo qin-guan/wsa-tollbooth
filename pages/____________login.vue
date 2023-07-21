@@ -92,7 +92,7 @@ async function verifyOtp() {
               </div>
 
               <div mt6>
-                <NuxtTurnstile v-model="formData.token" />
+                <LazyNuxtTurnstile v-model="formData.token" />
                 <br>
                 <Button type="submit" :loading="formData.pending" icon="" icon-pos="right" label="Get OTP" />
               </div>

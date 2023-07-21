@@ -190,7 +190,7 @@ async function submit() {
               </div>
 
               <div mt-8>
-                <NuxtTurnstile v-model="turnstileToken" />
+                <LazyNuxtTurnstile v-model="turnstileToken" />
                 <br>
                 <Button label="Submit" type="submit" :loading="pending" />
               </div>

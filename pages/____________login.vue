@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
-import type { TRPCError } from '@trpc/server'
+import { TRPCClientError } from '@trpc/client'
 
 const config = useRuntimeConfig()
 const { $client } = useNuxtApp()
@@ -36,7 +36,10 @@ async function generateOtp() {
   }
   catch (err) {
     console.error(err)
-    formData.error = (err as TRPCError).message
+    if (err instanceof TRPCClientError)
+      formData.error = err.message
+    else
+      formData.error = JSON.stringify(err)
   }
   finally {
     formData.pending = false
@@ -54,7 +57,10 @@ async function verifyOtp() {
   }
   catch (err) {
     console.error(err)
-    formData.error = (err as TRPCError).message
+    if (err instanceof TRPCClientError)
+      formData.error = err.message
+    else
+      formData.error = JSON.stringify(err)
   }
   finally {
     formData.pending = false

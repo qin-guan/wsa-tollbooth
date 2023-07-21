@@ -106,7 +106,7 @@ async function create() {
 <template>
   <div p-6 lg:px-30>
     <main flex flex-col gap10>
-      <NuxtImg peload height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
+      <NuxtImg preload fit="contain" width="135" height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
 
       <section>
         <Skeleton v-if="surveyPending" height="200px" />

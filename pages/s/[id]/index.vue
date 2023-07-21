@@ -145,10 +145,9 @@ async function submit() {
             <ClientOnly>
               <!-- Need ClientOnly if not reading localStorage will cause hydration mismatch -->
               <template #fallback>
-                <div mt-15 flex flex-col gap4>
-                  <Skeleton height="50px" />
-                  <Skeleton height="75px" />
-                  <Skeleton height="500px" />
+                <div v-for="(_, idx) in survey.questions" :key="idx" mt-15 flex flex-col gap4>
+                  <Skeleton height="30px" />
+                  <Skeleton height="150px" />
                 </div>
               </template>
 

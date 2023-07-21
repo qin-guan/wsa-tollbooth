@@ -7,7 +7,7 @@ const config = useRuntimeConfig()
 const { $client } = useNuxtApp()
 
 useSeoMeta({
-  title: config.public.appName,
+  title: 'Login',
 })
 
 const formData = reactive<{

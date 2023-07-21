@@ -109,9 +109,7 @@ async function submit() {
       <DashboardError v-if="surveyError" v-bind="surveyError" />
       <template v-else-if="survey">
         <div mx-auto max-w-3xl container>
-          <div class="w-[135px]">
-            <NuxtImg preload width="135px" densities="x1 x2 x3" quality="100" src="/images/logo.webp" />
-          </div>
+          <NuxtImg preload height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
 
           <div mt10>
             <h1 text-5xl font-bold>
@@ -195,6 +193,12 @@ async function submit() {
               </div>
             </ClientOnly>
           </form>
+
+          <br>
+
+          <small>
+            Never submit passwords. Your responses are saved on your device until you press "Submit".
+          </small>
         </div>
       </template>
     </main>

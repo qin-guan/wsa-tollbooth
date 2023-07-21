@@ -77,18 +77,12 @@ useSeoMeta({
         </div>
       </Dialog>
 
-      <Skeleton v-if="surveyPending" height="45px" />
-      <div
-        v-else-if="survey"
-      >
-        <div class="w-[135px]">
-          <NuxtImg preload width="135px" densities="x1 x2 x3" quality="100" src="/images/logo.webp" />
-        </div>
+      <NuxtImg preload height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
 
-        <h1 v-if="survey" mt8 text-xl font-bold>
-          Responses for {{ survey.title }}
-        </h1>
-      </div>
+      <Skeleton v-if="surveyPending" height="45px" />
+      <h1 v-else-if="survey" mt8 text-xl font-bold>
+        Responses for {{ survey.title }}
+      </h1>
 
       <Skeleton v-if="surveyPending || responsesPending" height="500px" />
       <DashboardError v-else-if="responsesError" v-bind="responsesError" />

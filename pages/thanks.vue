@@ -110,7 +110,7 @@ async function create() {
       <NuxtImg preload fit="inside" width="135" height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
 
       <Message severity="warn">
-        If you win a prize in the lucky draw, you will be informed through either <strong>Telegram or Phone Call</strong>.
+        If you win a prize in the lucky draw, you will be informed through <strong>Telegram or Phone Call</strong>.
         <br>
         Please keep a lookout for this number: <strong>+65 88** *511</strong>.
       </Message>

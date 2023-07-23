@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Message from 'primevue/message'
 import Skeleton from 'primevue/skeleton'
 import InputMask from 'primevue/inputmask'
 import Card from 'primevue/card'
@@ -107,6 +108,12 @@ async function create() {
   <div p-6 lg:px-30>
     <main flex flex-col gap10>
       <NuxtImg preload fit="inside" width="135" height="135" alt="World Skills ASEAN" densities="x1 x2 x3" src="/images/logo.webp" />
+
+      <Message severity="warn">
+        If you win a prize in the lucky draw, you will be informed through either <strong>Telegram or Phone Call</strong>.
+        <br>
+        Please keep a lookout for this number: <strong>+65 88** *511</strong>.
+      </Message>
 
       <section>
         <Skeleton v-if="surveyPending" height="200px" />

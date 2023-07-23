@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import type { Prisma, Survey, User } from '@prisma/client'
+import type { Prisma, Response, Survey, User } from '@prisma/client'
 
 import { protectedProcedure, publicProcedure, router } from '~/server/trpc/trpc'
 import type { SurveyPermissionSchema } from '~/shared/survey'
@@ -95,11 +95,14 @@ export const responseRouter = router({
       })
     })
     .query(async ({ ctx, input }) => {
-      const data = await ctx.prisma.response.findMany({
+      let data = await ctx.cache.surveys.getItem<Response[]>(`${input.surveyId}-responses`)
+      data ??= await ctx.prisma.response.findMany({
         where: {
           surveyId: input.surveyId,
         },
       })
+
+      await ctx.cache.surveys.setItem(`${input.surveyId}-responses`, data)
 
       return data
     }),
@@ -140,15 +143,17 @@ export const responseRouter = router({
           throw new TRPCError({ code: 'UNAUTHORIZED' })
       }
 
-      await ctx.prisma.response.create({
-        data: {
-          surveyId: input.surveyId,
-          respondentId: user.id,
-          data: input.data,
-        },
-      })
-
-      await ctx.cache.surveys.removeItem(`${user.id}-submitted`)
+      await Promise.all([
+        ctx.prisma.response.create({
+          data: {
+            surveyId: input.surveyId,
+            respondentId: user.id,
+            data: input.data,
+          },
+        }),
+        ctx.cache.surveys.removeItem(`${user.id}-submitted`),
+        ctx.cache.surveys.removeItem(`${input.surveyId}-responses`),
+      ])
 
       return true
     }),

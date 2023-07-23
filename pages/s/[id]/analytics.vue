@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import Paginator from 'primevue/paginator'
-import Dialog from 'primevue/dialog'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import DataTable from 'primevue/datatable'
-import Button from 'primevue/button'
-import Textarea from 'primevue/textarea'
 import Column from 'primevue/column'
-import Chart from 'primevue/chart'
-import RadioButton from 'primevue/radiobutton'
 import Skeleton from 'primevue/skeleton'
 import type { SurveyResponseSchema } from 'shared/survey'
+
+const Paginator = defineAsyncComponent(() => import('primevue/paginator'))
+const Dialog = defineAsyncComponent(() => import('primevue/dialog'))
+const Button = defineAsyncComponent(() => import('primevue/button'))
+const Textarea = defineAsyncComponent(() => import('primevue/textarea'))
+const Chart = defineAsyncComponent(() => import('primevue/chart'))
+const RadioButton = defineAsyncComponent(() => import('primevue/radiobutton'))
 
 definePageMeta({
   middleware: ['survey-permissions'],
@@ -155,19 +156,26 @@ const responsesByQn = computed(() => {
         <TabPanel header="By question">
           <Paginator v-model:first="responsePreview.qnIdx" :rows="1" :total-records="survey?.questions.length" template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
 
-          <div>
-            <span my10>
+          <div flex>
+            <span px2 py4 text-lg font-semibold>
               {{ survey?.questions[responsePreview.qnIdx].title }}
             </span>
-            <DataTable :value="responsesByQn">
-              <Column v-if="survey?.questions[responsePreview.qnIdx].type === 'text'" field="answer" header="Answer" />
-              <Column v-else-if="survey?.questions[responsePreview.qnIdx].type === 'mcq'" header="Option">
-                <template #body="bodySlot">
-                  {{ survey?.questions[responsePreview.qnIdx].options[bodySlot.data.option] }}
-                </template>
-              </Column>
-            </DataTable>
           </div>
+
+          <DataTable :value="responsesByQn">
+            <Column header="ID" style="width: 10%">
+              <template #body="bodySlot">
+                {{ bodySlot.index + 1 }}
+              </template>
+            </Column>
+
+            <Column v-if="survey?.questions[responsePreview.qnIdx].type === 'text'" field="answer" header="Answer" />
+            <Column v-else-if="survey?.questions[responsePreview.qnIdx].type === 'mcq'" header="Option">
+              <template #body="bodySlot">
+                {{ survey?.questions[responsePreview.qnIdx].options[bodySlot.data.option] }}
+              </template>
+            </Column>
+          </DataTable>
         </TabPanel>
         <TabPanel header="Charts">
           <Skeleton v-if="chartPending" height="300px" />

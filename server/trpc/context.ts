@@ -9,6 +9,7 @@ export async function createContext(_event: H3Event) {
   const config: SessionConfig = {
     name: useRuntimeConfig().sessionName,
     password: useRuntimeConfig().sessionSecret,
+    maxAge: 60 * 60 * 24 * 31,
   }
 
   const session = await useSession(_event, config)

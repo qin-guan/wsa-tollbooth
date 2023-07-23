@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Paginator from 'primevue/paginator'
 import Dialog from 'primevue/dialog'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -19,7 +20,7 @@ const { $client } = useNuxtApp()
 
 const responsePreview = reactive({
   visible: false,
-  idx: -1,
+  idx: 0,
 })
 
 const { data: responses, pending: responsesPending, error: responsesError } = await $client.response.list.useQuery({ surveyId: route.params.id as string }, { lazy: true })
@@ -48,7 +49,8 @@ useSeoMeta({
               "
             >
               <Textarea
-                v-if="question.type === 'text'" disabled :value="
+                v-if="question.type === 'text'"
+                class="w-full" disabled :value="
                   // @ts-expect-error Answer exists on text type
                   responses[responsePreview.idx].data[idx].answer
                 "
@@ -91,16 +93,6 @@ useSeoMeta({
           <DataTable :value="responses" table-class="w-full">
             <Column field="id" header="ID" />
             <Column field="timestamp" header="Timestamp" />
-            <Column header="Respondent">
-              <template #body="bodySlot">
-                <span v-if="bodySlot.data.respondent.name">
-                  {{ bodySlot.data.respondent.name }}
-                </span>
-                <span v-else>
-                  Unregistered
-                </span>
-              </template>
-            </Column>
             <Column header="Expand">
               <template #body="bodySlot">
                 <Button icon="" link @click="responsePreview.idx = bodySlot.index; responsePreview.visible = true">
@@ -110,29 +102,73 @@ useSeoMeta({
             </Column>
           </DataTable>
         </TabPanel>
+        <TabPanel header="By response">
+          <Paginator v-model:first="responsePreview.idx" :rows="1" :total-records="responses.length" template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+
+          <div v-for="(question, idx) in survey?.questions" :key="idx" flex flex-col gap3 py6>
+            <span font-semibold>{{ question.title }}</span>
+
+            <div
+              v-if="
+                // @ts-expect-error This exists
+                responses[responsePreview.idx].data[idx]
+              "
+            >
+              <Textarea
+                v-if="question.type === 'text'"
+                class="w-full" disabled :value="
+                  // @ts-expect-error Answer exists on text type
+                  responses[responsePreview.idx].data[idx].answer
+                "
+              />
+              <div v-else-if="question.type === 'mcq'" flex flex-col gap3>
+                <div v-for="(option, optionIdx) in question.options" :key="option" class="flex items-center">
+                  <RadioButton
+                    disabled
+                    :model-value="
+                      // @ts-expect-error Option does exist, but discriminated unions don't work well here
+                      responses[responsePreview.idx].data[idx].option
+                    "
+                    :value="optionIdx"
+                    :input-id="option"
+                  />
+                  <label :for="option" class="ml-2">{{ option }}</label>
+                </div>
+              </div>
+            </div>
+            <div v-else>
+              <span text-red-600>
+                No response as this question is new!
+              </span>
+            </div>
+          </div>
+        </TabPanel>
         <TabPanel header="Charts">
           <Skeleton v-if="chartPending" height="300px" />
           <DashboardError v-if="chartError" v-bind="chartError" />
-          <div v-else-if="chart" flex flex-col gap6>
-            <div
-              v-for="(qnChartData, idx) in chart"
-              :key="idx"
-            >
+          <div v-else-if="chart">
+            <div mx-auto max-w-3xl flex flex-col gap15>
               <div
-                v-if="qnChartData.labels.length > 0"
+                v-for="(qnChartData, idx) in chart"
+                :key="idx"
               >
-                <span font-semibold>
-                  {{ survey?.questions[idx].title }}
-                </span>
-                <Chart
-                  type="bar" :data="qnChartData" :options="{
-                    scales: {
-                      y: {
-                        beginAtZero: true,
+                <div
+                  v-if="qnChartData.labels.length > 0"
+                >
+                  <span font-semibold>
+                    {{ survey?.questions[idx].title }}
+                  </span>
+                  <Chart
+                    class="max-w-xl"
+                    type="bar" :data="qnChartData" :options="{
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                        },
                       },
-                    },
-                  }"
-                />
+                    }"
+                  />
+                </div>
               </div>
             </div>
           </div>

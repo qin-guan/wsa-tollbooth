@@ -99,9 +99,6 @@ export const responseRouter = router({
         where: {
           surveyId: input.surveyId,
         },
-        include: {
-          respondent: true,
-        },
       })
 
       return data

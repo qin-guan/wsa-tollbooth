@@ -198,6 +198,9 @@ async function submit() {
 
           <small>
             Never submit passwords. Your responses are saved on your device until you press "Submit".
+            <br>
+            <br>
+            <NuxtLink class="opacity-80 hover:underline" :to="`/s/${route.params.id}/analytics`">Responses (admin only)</NuxtLink>
           </small>
         </div>
       </template>

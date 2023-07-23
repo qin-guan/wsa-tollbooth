@@ -7,7 +7,6 @@ export default defineNuxtConfig({
   modules: [
     '@unocss/nuxt',
     '@vueuse/nuxt',
-    '@nuxtjs/html-validator',
     '@nuxt/image',
     '@nuxtjs/turnstile',
   ],
@@ -30,19 +29,6 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width,height=device-height,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover',
       htmlAttrs: { lang: 'en' },
-    },
-  },
-
-  htmlValidator: {
-    logLevel: 'error',
-    failOnError: true,
-    options: {
-      rules: {
-        'wcag/h37': 'warn',
-        'element-permitted-content': 'warn',
-        'element-required-attributes': 'warn',
-        'attribute-empty-style': 'off',
-      },
     },
   },
 

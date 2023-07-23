@@ -220,15 +220,16 @@ async function copy() {
           <Button size="small" label="Create new" @click="createForm.visible = true" />
         </div>
 
-        <DataTable v-else :value="surveys" table-style="width: 100%;">
+        <DataTable v-else :value="surveys" table-style="width: 100%;" class="p-datatable-sm">
           <Column field="id" header="ID" style="width: 20%;" />
-          <Column field="title" header="Title" :sortable="true" style="width: 50%" />
+          <Column field="title" header="Title" :sortable="true" style="width: 40%" />
           <Column field="workshop" header="Type" :sortable="true" style="width: 20%">
             <template #body="slotProps">
               <Badge v-if="slotProps.data.workshop" value="Workshop" />
               <Badge v-else value="Booth" severity="warning" />
             </template>
           </Column>
+          <Column field="responseCount" header="Responses" sortable style="width: 20%" />
           <Column header="Actions">
             <template #body="slotProps">
               <div flex>
@@ -264,12 +265,12 @@ async function copy() {
           Past winners
         </h3>
 
-        <DataTable v-if="pastWinners" :value="pastWinners">
-          <Column field="id" header="ID" style="width: 30%" />
+        <DataTable v-if="pastWinners" :value="pastWinners" class="p-datatable-sm" sort-field="wonTime" :sort-order="1">
+          <Column field="id" header="ID" style="width: 20%" />
           <Column field="name" header="Name" :sortable="true" style="width: 20%" />
-          <Column field="nric" header="NRIC" :sortable="true" style="width: 20%" />
+          <Column field="nric" header="NRIC" :sortable="true" style="width: 10%" />
           <Column field="phone" header="Phone" :sortable="true" style="width: 10%" />
-          <Column field="wonTime" header="Timestamp" :sortable="true" style="width: 10%" />
+          <Column field="wonTime" header="Timestamp" :sortable="true" style="width: 20%" />
           <Column header="Delete" style="width: 10%">
             <template #body="slotProps">
               <Button label="Delete" size="small" severity="danger" @click="deleteWinner(slotProps.data.id)" />

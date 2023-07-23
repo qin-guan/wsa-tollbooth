@@ -9,6 +9,7 @@ import type { QuestionsSchema, SurveyPermissionSchema } from '~/shared/survey'
 import { questionsSchema, surveyPermissionSchema } from '~/shared/survey'
 
 const ALL_SURVEYS_KEY = '__all_surveys'
+const RESPONSE_COUNT_KEY = '__response_count'
 
 export const surveyRouter = router({
   get: publicProcedure
@@ -64,13 +65,40 @@ export const surveyRouter = router({
     }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
-    if (await ctx.cache.surveys.hasItem(ALL_SURVEYS_KEY))
-      return await ctx.cache.surveys.getItem<Survey[]>(ALL_SURVEYS_KEY) ?? []
+    let [surveys, responseCount] = await Promise.all([
+      ctx.cache.surveys.getItem<Survey[]>(ALL_SURVEYS_KEY),
+      ctx.cache.surveys.getItem<{
+        surveyId: string
+        _count: {
+          _all: number
+        }
+      }[]>(RESPONSE_COUNT_KEY),
+    ])
 
-    const surveys = await ctx.prisma.survey.findMany()
-    await ctx.cache.surveys.setItem(ALL_SURVEYS_KEY, surveys)
+    surveys ??= await ctx.prisma.survey.findMany()
+    responseCount ??= await ctx.prisma.response.groupBy({
+      by: ['surveyId'],
+      _count: {
+        _all: true,
+      },
+    })
 
-    return surveys
+    await Promise.all([
+      ctx.cache.surveys.setItem(ALL_SURVEYS_KEY, surveys),
+      ctx.cache.surveys.setItem(RESPONSE_COUNT_KEY, responseCount),
+    ])
+
+    const result = surveys.map(r => ({ responseCount: 0, ...r }))
+
+    for (const { surveyId, _count } of responseCount) {
+      const survey = result.find(s => s.id === surveyId)
+      if (!survey)
+        continue
+
+      survey.responseCount = _count._all
+    }
+
+    return result
   }),
 
   create: protectedProcedure

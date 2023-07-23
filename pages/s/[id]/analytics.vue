@@ -10,6 +10,7 @@ import Column from 'primevue/column'
 import Chart from 'primevue/chart'
 import RadioButton from 'primevue/radiobutton'
 import Skeleton from 'primevue/skeleton'
+import type { SurveyResponseSchema } from 'shared/survey'
 
 definePageMeta({
   middleware: ['survey-permissions'],
@@ -20,7 +21,8 @@ const { $client } = useNuxtApp()
 
 const responsePreview = reactive({
   visible: false,
-  idx: 0,
+  idx: 0, // Hacky, may fail if no qns in survey
+  qnIdx: 0, // Same
 })
 
 const { data: responses, pending: responsesPending, error: responsesError } = await $client.response.list.useQuery({ surveyId: route.params.id as string }, { lazy: true })
@@ -29,6 +31,12 @@ const { data: survey, pending: surveyPending, error: surveyError } = await $clie
 
 useSeoMeta({
   title: `${survey.value?.title} Analytics` ?? 'Loading...',
+})
+
+const responsesByQn = computed(() => {
+  return responses.value.map((r) => {
+    return (r.data as SurveyResponseSchema)[responsePreview.qnIdx]
+  })
 })
 </script>
 
@@ -103,6 +111,7 @@ useSeoMeta({
           </DataTable>
         </TabPanel>
         <TabPanel header="By response">
+          <!-- Also hacky, uses same idx as dialog in tab panel above -->
           <Paginator v-model:first="responsePreview.idx" :rows="1" :total-records="responses.length" template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
 
           <div v-for="(question, idx) in survey?.questions" :key="idx" flex flex-col gap3 py6>
@@ -141,6 +150,23 @@ useSeoMeta({
                 No response as this question is new!
               </span>
             </div>
+          </div>
+        </TabPanel>
+        <TabPanel header="By question">
+          <Paginator v-model:first="responsePreview.qnIdx" :rows="1" :total-records="survey?.questions.length" template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+
+          <div>
+            <span my10>
+              {{ survey?.questions[responsePreview.qnIdx].title }}
+            </span>
+            <DataTable :value="responsesByQn">
+              <Column v-if="survey?.questions[responsePreview.qnIdx].type === 'text'" field="answer" header="Answer" />
+              <Column v-else-if="survey?.questions[responsePreview.qnIdx].type === 'mcq'" header="Option">
+                <template #body="bodySlot">
+                  {{ survey?.questions[responsePreview.qnIdx].options[bodySlot.data.option] }}
+                </template>
+              </Column>
+            </DataTable>
           </div>
         </TabPanel>
         <TabPanel header="Charts">

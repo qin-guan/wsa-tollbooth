@@ -117,6 +117,7 @@ export const luckyDrawRouter = router({
       },
       data: {
         won: true,
+        wonTime: new Date(),
       },
     })
   }),

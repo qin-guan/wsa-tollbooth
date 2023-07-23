@@ -268,7 +268,8 @@ async function copy() {
           <Column field="id" header="ID" style="width: 30%" />
           <Column field="name" header="Name" :sortable="true" style="width: 20%" />
           <Column field="nric" header="NRIC" :sortable="true" style="width: 20%" />
-          <Column field="phone" header="Phone" :sortable="true" style="width: 20%" />
+          <Column field="phone" header="Phone" :sortable="true" style="width: 10%" />
+          <Column field="wonTime" header="Timestamp" :sortable="true" style="width: 10%" />
           <Column header="Delete" style="width: 10%">
             <template #body="slotProps">
               <Button label="Delete" size="small" severity="danger" @click="deleteWinner(slotProps.data.id)" />

@@ -29,6 +29,7 @@ model User {
 
   admin Boolean
   won   Boolean?
+  wonTime DateTime?
 
   surveyResponses Response[]
 }

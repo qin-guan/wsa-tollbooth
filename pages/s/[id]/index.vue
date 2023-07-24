@@ -134,7 +134,7 @@ async function submit() {
                 Do check out our other booths and workshops!
               </template>
               <template #content>
-                <Button label="Edit lucky draw information" @click="navigateTo('/thanks')" />
+                <Button label="View completed surveys" @click="navigateTo('/thanks')" />
               </template>
             </Card>
           </div>

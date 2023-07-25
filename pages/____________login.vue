@@ -112,7 +112,7 @@ async function verifyOtp() {
               </div>
 
               <div mt6>
-                <Button type="submit" :loading="formData.pending" icon="" icon-pos="right" label="Login" />
+                <Button type="submit" :loading="formData.pending" icon="" icon-pos="right" label="Login!" />
               </div>
             </form>
           </div>

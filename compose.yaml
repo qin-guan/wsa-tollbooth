@@ -1,0 +1,6 @@
+﻿services:
+  wsatollbooth.webapp:
+    image: wsatollbooth.webapp
+    build:
+      context: .
+      dockerfile: WsaTollbooth.WebApp/Dockerfile

@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using WsaTollbooth.WebApp.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSqlite<AppDbContext>(builder.Configuration.GetConnectionString("Sqlite"));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -25,10 +29,13 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()
     .WithStaticAssets();
+
+app.MapDefaultControllerRoute();
 
 app.Run();

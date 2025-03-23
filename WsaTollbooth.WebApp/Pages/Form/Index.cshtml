@@ -1,0 +1,8 @@
+@page "/Form/{FormId:guid}"
+@model WsaTollbooth.WebApp.Pages.Form.Index
+
+@{
+    ViewData["Title"] = "Form";
+}
+
+@RouteData.Values["FormId"]

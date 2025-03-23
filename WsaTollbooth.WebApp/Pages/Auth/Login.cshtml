@@ -1,0 +1,18 @@
+@page
+@model WsaTollbooth.WebApp.Pages.Auth.Login
+
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label asp-for="Input.Email" class="form-label">Email</label>
+            <input asp-for="Input.Email" class="form-control" type="email" autocomplete="username"
+                   aria-required="true" placeholder="your@email.com"/>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="w-100 btn btn-primary">Login</button>
+    </form>
+</div>
+

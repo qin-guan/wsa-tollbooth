@@ -16,6 +16,7 @@ public partial class AppDbContext : DbContext
     public DbSet<FormSubmission> FormSubmissions { get; set; }
     public DbSet<SelectFormField> SelectFormFields { get; set; }
     public DbSet<TextFormField> TextFormFields { get; set; }
+    public DbSet<Otp> Otps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
